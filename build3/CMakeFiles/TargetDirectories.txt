@@ -1,0 +1,16 @@
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/adding_handles.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/colored_face.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/constrained.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/constrained_hierarchy_plus.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/constrained_plus.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/hierarchy.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/info_insert_with_pair_iterator_2.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/info_insert_with_pair_iterator_regular_2.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/info_insert_with_transform_iterator_2.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/info_insert_with_zip_iterator_2.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/polygon_triangulation.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/print_cropped_voronoi.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/regular.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/terrain.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/triangulation_prog1.dir
+/Users/NewUniverse/Documents/porousMetal/Triangulation_2/build3/CMakeFiles/voronoi.dir
