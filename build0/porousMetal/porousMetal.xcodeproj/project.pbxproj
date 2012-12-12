@@ -1,0 +1,295 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		394D9B40165391CE004FA333 /* Rendering.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 394D9B3E165391CE004FA333 /* Rendering.cpp */; };
+		397094D3162AD7F300AB19F0 /* libboost_regex-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 397094D2162AD7F300AB19F0 /* libboost_regex-mt.dylib */; };
+		397094D7162AF30200AB19F0 /* Calculate_Voronoi_vertex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 397094D5162AF30200AB19F0 /* Calculate_Voronoi_vertex.cpp */; };
+		398BBC38162AD3D8008C73F8 /* libboost_regex-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 398BBC37162AD3D8008C73F8 /* libboost_regex-mt.a */; };
+		398E0B33165B57E100E07213 /* Voxel.DistanceField.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 398E0B31165B57E100E07213 /* Voxel.DistanceField.cpp */; };
+		39AD56BC16159B92009FAFAC /* Opengl_Rendering.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39AD56BA16159B92009FAFAC /* Opengl_Rendering.cpp */; };
+		39B9E8C61600710A00A3606A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39B9E8C51600710A00A3606A /* main.cpp */; };
+		39B9E8C81600710A00A3606A /* porousMetal.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 39B9E8C71600710A00A3606A /* porousMetal.1 */; };
+		39B9E8CF1600713200A3606A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39B9E8CE1600713200A3606A /* OpenGL.framework */; };
+		39B9E8D11600714700A3606A /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39B9E8D01600714700A3606A /* GLUT.framework */; };
+		39B9E8D31600715200A3606A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39B9E8D21600715200A3606A /* Foundation.framework */; };
+		39B9E8D6160077A200A3606A /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39B9E8D5160077A200A3606A /* FileStream.cpp */; };
+		39B9E8D81600834F00A3606A /* ConstValueManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39B9E8D71600834F00A3606A /* ConstValueManager.cpp */; };
+		39B9E8DA1600DB2B00A3606A /* Labeling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39B9E8D91600DB2B00A3606A /* Labeling.cpp */; };
+		39C0FA9B16636B8F003394F6 /* Meshing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39C0FA9916636B8F003394F6 /* Meshing.cpp */; };
+		39CBED2116511CB2003EA345 /* ConstValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39CBED1F16511CB1003EA345 /* ConstValue.cpp */; };
+		39CBED24165122D1003EA345 /* Voxel.FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39CBED22165122D0003EA345 /* Voxel.FileStream.cpp */; };
+		39CBED27165136F5003EA345 /* Voxel.Labeling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39CBED25165136F5003EA345 /* Voxel.Labeling.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		39B9E8BF1600710A00A3606A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				39B9E8C81600710A00A3606A /* porousMetal.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		394D9B3E165391CE004FA333 /* Rendering.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rendering.cpp; sourceTree = "<group>"; };
+		394D9B3F165391CE004FA333 /* Rendering.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rendering.h; sourceTree = "<group>"; };
+		397094D2162AD7F300AB19F0 /* libboost_regex-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_regex-mt.dylib"; path = "../../../../../../opt/local/lib/libboost_regex-mt.dylib"; sourceTree = "<group>"; };
+		397094D5162AF30200AB19F0 /* Calculate_Voronoi_vertex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Calculate_Voronoi_vertex.cpp; sourceTree = "<group>"; };
+		398BBC37162AD3D8008C73F8 /* libboost_regex-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_regex-mt.a"; path = "../../../../../../opt/local/lib/libboost_regex-mt.a"; sourceTree = "<group>"; };
+		398E0B31165B57E100E07213 /* Voxel.DistanceField.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Voxel.DistanceField.cpp; sourceTree = "<group>"; };
+		39AD56BA16159B92009FAFAC /* Opengl_Rendering.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Opengl_Rendering.cpp; sourceTree = "<group>"; };
+		39B9E8C11600710A00A3606A /* porousMetal */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = porousMetal; sourceTree = BUILT_PRODUCTS_DIR; };
+		39B9E8C51600710A00A3606A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		39B9E8C71600710A00A3606A /* porousMetal.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = porousMetal.1; sourceTree = "<group>"; };
+		39B9E8CE1600713200A3606A /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		39B9E8D01600714700A3606A /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		39B9E8D21600715200A3606A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		39B9E8D4160076FF00A3606A /* porousMetalAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = porousMetalAPI.h; sourceTree = "<group>"; };
+		39B9E8D5160077A200A3606A /* FileStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileStream.cpp; sourceTree = "<group>"; };
+		39B9E8D71600834F00A3606A /* ConstValueManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConstValueManager.cpp; sourceTree = "<group>"; };
+		39B9E8D91600DB2B00A3606A /* Labeling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Labeling.cpp; sourceTree = "<group>"; };
+		39C0FA9916636B8F003394F6 /* Meshing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Meshing.cpp; sourceTree = "<group>"; };
+		39C0FA9A16636B8F003394F6 /* Mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mesh.h; sourceTree = "<group>"; };
+		39CBED1D165118A3003EA345 /* API.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = API.h; sourceTree = "<group>"; };
+		39CBED1F16511CB1003EA345 /* ConstValue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConstValue.cpp; sourceTree = "<group>"; };
+		39CBED2016511CB1003EA345 /* ConstValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConstValue.h; sourceTree = "<group>"; };
+		39CBED22165122D0003EA345 /* Voxel.FileStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Voxel.FileStream.cpp; sourceTree = "<group>"; };
+		39CBED23165122D0003EA345 /* Voxel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Voxel.h; sourceTree = "<group>"; };
+		39CBED25165136F5003EA345 /* Voxel.Labeling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Voxel.Labeling.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		39B9E8BE1600710A00A3606A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				397094D3162AD7F300AB19F0 /* libboost_regex-mt.dylib in Frameworks */,
+				398BBC38162AD3D8008C73F8 /* libboost_regex-mt.a in Frameworks */,
+				39B9E8D31600715200A3606A /* Foundation.framework in Frameworks */,
+				39B9E8D11600714700A3606A /* GLUT.framework in Frameworks */,
+				39B9E8CF1600713200A3606A /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		39B9E8B61600710A00A3606A = {
+			isa = PBXGroup;
+			children = (
+				397094D2162AD7F300AB19F0 /* libboost_regex-mt.dylib */,
+				398BBC37162AD3D8008C73F8 /* libboost_regex-mt.a */,
+				39B9E8D21600715200A3606A /* Foundation.framework */,
+				39B9E8D01600714700A3606A /* GLUT.framework */,
+				39B9E8CE1600713200A3606A /* OpenGL.framework */,
+				39B9E8C41600710A00A3606A /* porousMetal */,
+				39B9E8C21600710A00A3606A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		39B9E8C21600710A00A3606A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				39B9E8C11600710A00A3606A /* porousMetal */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		39B9E8C41600710A00A3606A /* porousMetal */ = {
+			isa = PBXGroup;
+			children = (
+				39C0FA9916636B8F003394F6 /* Meshing.cpp */,
+				394D9B3F165391CE004FA333 /* Rendering.h */,
+				39B9E8C51600710A00A3606A /* main.cpp */,
+				394D9B3E165391CE004FA333 /* Rendering.cpp */,
+				398E0B31165B57E100E07213 /* Voxel.DistanceField.cpp */,
+				39CBED25165136F5003EA345 /* Voxel.Labeling.cpp */,
+				39CBED22165122D0003EA345 /* Voxel.FileStream.cpp */,
+				39CBED23165122D0003EA345 /* Voxel.h */,
+				39CBED1F16511CB1003EA345 /* ConstValue.cpp */,
+				39CBED2016511CB1003EA345 /* ConstValue.h */,
+				39CBED1D165118A3003EA345 /* API.h */,
+				39C0FA9A16636B8F003394F6 /* Mesh.h */,
+				39B9E8D71600834F00A3606A /* ConstValueManager.cpp */,
+				397094D5162AF30200AB19F0 /* Calculate_Voronoi_vertex.cpp */,
+				39AD56BA16159B92009FAFAC /* Opengl_Rendering.cpp */,
+				39B9E8D91600DB2B00A3606A /* Labeling.cpp */,
+				39B9E8D5160077A200A3606A /* FileStream.cpp */,
+				39B9E8D4160076FF00A3606A /* porousMetalAPI.h */,
+				39B9E8C71600710A00A3606A /* porousMetal.1 */,
+			);
+			path = porousMetal;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		39B9E8C01600710A00A3606A /* porousMetal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39B9E8CB1600710A00A3606A /* Build configuration list for PBXNativeTarget "porousMetal" */;
+			buildPhases = (
+				39B9E8BD1600710A00A3606A /* Sources */,
+				39B9E8BE1600710A00A3606A /* Frameworks */,
+				39B9E8BF1600710A00A3606A /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = porousMetal;
+			productName = porousMetal;
+			productReference = 39B9E8C11600710A00A3606A /* porousMetal */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		39B9E8B81600710A00A3606A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "東京大学";
+			};
+			buildConfigurationList = 39B9E8BB1600710A00A3606A /* Build configuration list for PBXProject "porousMetal" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 39B9E8B61600710A00A3606A;
+			productRefGroup = 39B9E8C21600710A00A3606A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				39B9E8C01600710A00A3606A /* porousMetal */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		39B9E8BD1600710A00A3606A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				39B9E8C61600710A00A3606A /* main.cpp in Sources */,
+				39B9E8D6160077A200A3606A /* FileStream.cpp in Sources */,
+				39B9E8D81600834F00A3606A /* ConstValueManager.cpp in Sources */,
+				39B9E8DA1600DB2B00A3606A /* Labeling.cpp in Sources */,
+				39AD56BC16159B92009FAFAC /* Opengl_Rendering.cpp in Sources */,
+				397094D7162AF30200AB19F0 /* Calculate_Voronoi_vertex.cpp in Sources */,
+				39CBED2116511CB2003EA345 /* ConstValue.cpp in Sources */,
+				39CBED24165122D1003EA345 /* Voxel.FileStream.cpp in Sources */,
+				39CBED27165136F5003EA345 /* Voxel.Labeling.cpp in Sources */,
+				394D9B40165391CE004FA333 /* Rendering.cpp in Sources */,
+				398E0B33165B57E100E07213 /* Voxel.DistanceField.cpp in Sources */,
+				39C0FA9B16636B8F003394F6 /* Meshing.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		39B9E8C91600710A00A3606A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				"OTHER_CPLUSPLUSFLAGS[arch=*]" = "-I/opt/local/include/";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		39B9E8CA1600710A00A3606A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				"OTHER_CPLUSPLUSFLAGS[arch=*]" = "-I/opt/local/include/";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		39B9E8CC1600710A00A3606A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		39B9E8CD1600710A00A3606A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/opt/local/lib,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		39B9E8BB1600710A00A3606A /* Build configuration list for PBXProject "porousMetal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39B9E8C91600710A00A3606A /* Debug */,
+				39B9E8CA1600710A00A3606A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39B9E8CB1600710A00A3606A /* Build configuration list for PBXNativeTarget "porousMetal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39B9E8CC1600710A00A3606A /* Debug */,
+				39B9E8CD1600710A00A3606A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 39B9E8B81600710A00A3606A /* Project object */;
+}
