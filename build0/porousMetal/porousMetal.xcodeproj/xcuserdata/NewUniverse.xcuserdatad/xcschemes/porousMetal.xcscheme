@@ -34,7 +34,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.GDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "YES"
-      customWorkingDirectory = "/Users/NewUniverse/Documents/Triangulation_2/build0/"
+      customWorkingDirectory = "/Users/NewUniverse/Documents/Labo_Remote/Triangulation_2/build0"
       buildConfiguration = "Debug"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"

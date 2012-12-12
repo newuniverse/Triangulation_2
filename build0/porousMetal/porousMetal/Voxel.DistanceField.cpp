@@ -46,8 +46,8 @@ void Voxel::ComputeDistanceField()
     
     cout << "end propagation"<<endl;
     //Distance fieldの結果を書き出し
-    WriteBinaryFile(voxel, "DistanceField");
-    WriteTextFile(voxel, "DistanceField");
+    if(cv.GetDim() == 3) WriteBinaryFile(voxel, "DistanceField");//3D
+    if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField"); //2D
     
     //local maximumを探す
     for(int i = 0; i < x; i++){
@@ -188,8 +188,8 @@ void Voxel::ComputeDistanceField()
        
     }
     delete[] _coordinate;
-    WriteBinaryFile(voxel, "Matching");
-    WriteTextFile(voxel, "Matching");
+    if(cv.GetDim() == 3) WriteBinaryFile(voxel, "Matching");
+    if(cv.GetDim() == 2) WriteTextFile(voxel, "Matching");
     cout << "end distance field!"<<endl;
 }
 //ローカルマキシマムなボクセルを見つける

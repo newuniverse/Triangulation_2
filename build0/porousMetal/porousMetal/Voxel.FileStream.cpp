@@ -161,27 +161,36 @@ void Voxel::WriteBinaryFile(float ***table, string filename){
 }
 
 void Voxel::WriteSphere(){
-        ofstream fout;
-        fout.open("regular_input.txt");
-        if(!fout.is_open())
+    ofstream fout;
+    fout.open("regular_input.txt"); //CGALに渡すデータ
+    ConstValue cv;
+    if(!fout.is_open())
+    {
+        cout << "ファイルをオープンできません" << endl;
+    }
+    else
+    {
+        //コーナーの2点
+        //fout << 0 << " " << 0 << " "<< 0 << "\n";
+        //fout << cvm.x << " " << 0 << " "<< 0 << "\n";
+        //重心点
+        for (int i = 1; i < radius.size(); i++)//index = 0は周りの非材料部分, 1からがセル
         {
-            cout << "ファイルをオープンできません" << endl;
-        }
-        else
-        {
-            //コーナーの2点
-            //fout << 0 << " " << 0 << " "<< 0 << "\n";
-            //fout << cvm.x << " " << 0 << " "<< 0 << "\n";
-            //重心点
-            for (int i = 1; i < radius.size(); i++)//index = 0は周りの非材料部分, 1からがセル
-            {
-                if(radius[i] < 0) break;
-                if(radius[i] != 0 && x_center[i] != 0) fout << x_center[i] << " " << y_center[i]<< " " /*<< z_center[i]*/ << " " << radius[i]*radius[i]<< "\n";
+            if(radius[ i ] < 0) break;
+            if(radius[ i ] != 0 && x_center[i] != 0 ){
+                if( cv.GetDim() == 2 ){
+                fout << x_center[i] << " " << y_center[i]<< " " << radius[i]*radius[i]<< "\n";
+                }
+                if(cv.GetDim() == 3){
+                    fout << x_center[i] << " " << y_center[i]<< " " << z_center[i] << " " << radius[i]*radius[i]<< "\n";
+                }
             }
-            //コーナーの2点
-            //fout << 0 << " " << cvm.y <<  " " << 0 << "\n";
-            //fout << cvm.x << " " << cvm.y <<  " " << 0 << "\n";
+            
         }
-        fout.close();
-        fout.clear();
+        //コーナーの2点
+        //fout << 0 << " " << cvm.y <<  " " << 0 << "\n";
+        //fout << cvm.x << " " << cvm.y <<  " " << 0 << "\n";
+    }
+    fout.close();
+    fout.clear();
 }

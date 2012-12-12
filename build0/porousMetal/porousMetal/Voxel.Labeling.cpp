@@ -191,8 +191,8 @@ void Voxel::Labeling()
         for(int j = 0; j < y; j++)
             for(int k = 0; k < z; k++)
                 labelLayer[i][j][k] = voxel[i][j][k];
-    WriteTextFile(voxel, "labeled");
-    WriteBinaryFile();
+    if(cv.GetDim() == 2) WriteTextFile(voxel, "labeled");
+    if(cv.GetDim() == 3) WriteBinaryFile();
     cout << "minimumRadius = "<< minimumRadius <<endl;
 }
 

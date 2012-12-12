@@ -14,10 +14,10 @@ int main (int argc, char ** argv)
         case cv.VOXEL_PROCESSING:
         {
             Voxel vox;
-            vox.ReadFile(cv.fileTobeRead);
-            //vox.ReadBinaryFile(cv.fileTobeRead);
+            if(cv.GetDim() == 2) vox.ReadFile(cv.fileTobeRead);
+            if(cv.GetDim() == 3) vox.ReadBinaryFile(cv.fileTobeRead);
             vox.Labeling(); //ラベリング
-            vox.ReadFile(cv.fileTobeRead);
+            if(cv.GetDim() == 2)vox.ReadFile(cv.fileTobeRead);
             vox.ComputeDistanceField();
             vox.WriteSphere();  //球近似ごの重心と半径の書き出し
             break;
@@ -25,13 +25,18 @@ int main (int argc, char ** argv)
         case cv.VOXEL_DISTANCEFIELD:
         {
             Voxel vox;
-            //vox.ReadBinaryFile(cv.fileTobeRead); //ボクセル読み込み
-            vox.ReadFile(cv.fileTobeRead);
+            if(cv.GetDim() == 3) vox.ReadBinaryFile(cv.fileTobeRead); //ボクセル読み込み
+            if(cv.GetDim() == 2) vox.ReadFile(cv.fileTobeRead);
+            
             vox.Labeling(); //ラベリング
-            //vox.ReadBinaryFile(cv.fileTobeRead);
-            vox.ReadFile(cv.fileTobeRead);
+            
+            if(cv.GetDim() == 3) vox.ReadBinaryFile(cv.fileTobeRead);
+            if(cv.GetDim() == 2) vox.ReadFile(cv.fileTobeRead);
+            
             vox.ComputeDistanceField(); //距離場計算
             vox.WriteSphere();  //球近似ごの重心と半径の書き出し
+            system("./regular");//CGALにVoronoiとDelaunayを計算してもらう
+            cout << "end regular" << endl;
             cv.MovePhase();
             break;
         }
