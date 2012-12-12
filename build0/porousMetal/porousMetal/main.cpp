@@ -4,7 +4,7 @@
 #include "Rendering.h"
 #include "Mesh.h"
 Calculate_Voronoi_vertex cvv;
-
+////
 int main (int argc, char ** argv)
 {
     ConstValue cv;
@@ -48,7 +48,7 @@ int main (int argc, char ** argv)
         case cv.BOTH:
         {
             Voxel vox;
-            //vox.ReadFile(cv.fileTobeRead); //ボクセル読み込み
+            ////vox.ReadFile(cv.fileTobeRead); //ボクセル読み込み
             vox.ReadBinaryFile(cv.fileTobeRead);
             vox.Labeling(); //ラベリング
             vox.WriteBinaryFile();    //ラベリング処理後のボクセル書き出し
