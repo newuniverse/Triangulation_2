@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		394D9B40165391CE004FA333 /* Rendering.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 394D9B3E165391CE004FA333 /* Rendering.cpp */; };
-		397094D3162AD7F300AB19F0 /* libboost_regex-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 397094D2162AD7F300AB19F0 /* libboost_regex-mt.dylib */; };
 		397094D7162AF30200AB19F0 /* Calculate_Voronoi_vertex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 397094D5162AF30200AB19F0 /* Calculate_Voronoi_vertex.cpp */; };
-		398BBC38162AD3D8008C73F8 /* libboost_regex-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 398BBC37162AD3D8008C73F8 /* libboost_regex-mt.a */; };
 		398E0B33165B57E100E07213 /* Voxel.DistanceField.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 398E0B31165B57E100E07213 /* Voxel.DistanceField.cpp */; };
 		39AD56BC16159B92009FAFAC /* Opengl_Rendering.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39AD56BA16159B92009FAFAC /* Opengl_Rendering.cpp */; };
+		39B027AA167857E70000F650 /* libboost_regex-mt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39B027A9167857E70000F650 /* libboost_regex-mt.a */; };
+		39B027AD167858080000F650 /* libboost_regex-mt.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 39B027AC167858080000F650 /* libboost_regex-mt.dylib */; };
 		39B9E8C61600710A00A3606A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 39B9E8C51600710A00A3606A /* main.cpp */; };
 		39B9E8C81600710A00A3606A /* porousMetal.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 39B9E8C71600710A00A3606A /* porousMetal.1 */; };
 		39B9E8CF1600713200A3606A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39B9E8CE1600713200A3606A /* OpenGL.framework */; };
@@ -43,11 +43,11 @@
 /* Begin PBXFileReference section */
 		394D9B3E165391CE004FA333 /* Rendering.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rendering.cpp; sourceTree = "<group>"; };
 		394D9B3F165391CE004FA333 /* Rendering.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rendering.h; sourceTree = "<group>"; };
-		397094D2162AD7F300AB19F0 /* libboost_regex-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_regex-mt.dylib"; path = "../../../../../../opt/local/lib/libboost_regex-mt.dylib"; sourceTree = "<group>"; };
 		397094D5162AF30200AB19F0 /* Calculate_Voronoi_vertex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Calculate_Voronoi_vertex.cpp; sourceTree = "<group>"; };
-		398BBC37162AD3D8008C73F8 /* libboost_regex-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_regex-mt.a"; path = "../../../../../../opt/local/lib/libboost_regex-mt.a"; sourceTree = "<group>"; };
 		398E0B31165B57E100E07213 /* Voxel.DistanceField.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Voxel.DistanceField.cpp; sourceTree = "<group>"; };
 		39AD56BA16159B92009FAFAC /* Opengl_Rendering.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Opengl_Rendering.cpp; sourceTree = "<group>"; };
+		39B027A9167857E70000F650 /* libboost_regex-mt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libboost_regex-mt.a"; path = "../../../../../../../opt/local/lib/libboost_regex-mt.a"; sourceTree = "<group>"; };
+		39B027AC167858080000F650 /* libboost_regex-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_regex-mt.dylib"; path = "../../../../../../../opt/local/lib/libboost_regex-mt.dylib"; sourceTree = "<group>"; };
 		39B9E8C11600710A00A3606A /* porousMetal */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = porousMetal; sourceTree = BUILT_PRODUCTS_DIR; };
 		39B9E8C51600710A00A3606A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		39B9E8C71600710A00A3606A /* porousMetal.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = porousMetal.1; sourceTree = "<group>"; };
@@ -73,8 +73,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				397094D3162AD7F300AB19F0 /* libboost_regex-mt.dylib in Frameworks */,
-				398BBC38162AD3D8008C73F8 /* libboost_regex-mt.a in Frameworks */,
+				39B027AD167858080000F650 /* libboost_regex-mt.dylib in Frameworks */,
+				39B027AA167857E70000F650 /* libboost_regex-mt.a in Frameworks */,
 				39B9E8D31600715200A3606A /* Foundation.framework in Frameworks */,
 				39B9E8D11600714700A3606A /* GLUT.framework in Frameworks */,
 				39B9E8CF1600713200A3606A /* OpenGL.framework in Frameworks */,
@@ -87,8 +87,8 @@
 		39B9E8B61600710A00A3606A = {
 			isa = PBXGroup;
 			children = (
-				397094D2162AD7F300AB19F0 /* libboost_regex-mt.dylib */,
-				398BBC37162AD3D8008C73F8 /* libboost_regex-mt.a */,
+				39B027AC167858080000F650 /* libboost_regex-mt.dylib */,
+				39B027A9167857E70000F650 /* libboost_regex-mt.a */,
 				39B9E8D21600715200A3606A /* Foundation.framework */,
 				39B9E8D01600714700A3606A /* GLUT.framework */,
 				39B9E8CE1600713200A3606A /* OpenGL.framework */,
