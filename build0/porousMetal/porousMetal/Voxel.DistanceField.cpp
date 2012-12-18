@@ -53,7 +53,7 @@ void Voxel::ComputeDistanceField()
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
-                if(voxel[i][j][k] + 1.0 >= 0.01){ //除外されていないボクセル
+                if(voxel[i][j][k] + 1.0 >= 0.01){ //除外されていないボクセル,除外は-1になるので
                     int xx = i; int yy= j; int zz = k; float r(0);
                     do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
                     if(r >= minimumRadius ) {
@@ -180,10 +180,6 @@ void Voxel::ComputeDistanceField()
                     radius.push_back(rad_temp_center[data[i].second]);
                 }
             }
-        }
-        if(it != data.end()){
-            //++it;
-            //++it_counter;
         }
        
     }

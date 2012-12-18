@@ -39,6 +39,7 @@ if ( CGAL_FOUND )
   create_single_source_cgal_program( "terrain.cpp" )
   create_single_source_cgal_program( "triangulation_prog1.cpp" )
   create_single_source_cgal_program( "voronoi.cpp" )
+  create_single_source_cgal_program( "regular_3.cpp" )
 
 else()
   

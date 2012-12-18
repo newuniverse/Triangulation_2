@@ -541,7 +541,6 @@ void Rendering::Display()
 //球の座標、半径データ読み込み
 void Rendering::ReadCoordinate(string filename)
 {
-    //InitValues();
     ifstream fin;
     fin.open(filename.c_str());
     fin >> verN;
