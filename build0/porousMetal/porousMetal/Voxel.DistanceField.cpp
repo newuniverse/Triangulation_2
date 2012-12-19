@@ -4,29 +4,21 @@
 void Voxel::ComputeDistanceField()
 {
     cout << "begin distance field!"<< endl;
+    
+    int forward(0), backward(1);
+    
     ConstValue cv;
     int x(0),y(0),z(0);
-    int forward(0), backward(1);
+    
     x = cv.GetX();
     y = cv.GetY();
     z = cv.GetZ();
-    //voxelの初期化
-    for(int i = 0; i < x; i++){
-        for (int j = 0; j < y; j++) {
-            for (int k = 0; k < z; k++) {
-                switch((int)voxel[i][j][k]) {
-                    case 0:
-                        voxel[i][j][k] = inf;
-                        break;
-                    case 1:
-                        voxel[i][j][k] = 0;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
+    
+    if(cv.GetDim() == 3) ReadBinaryFile(cv.fileTobeRead);
+    if(cv.GetDim() == 2) ReadFile(cv.fileTobeRead);
+    InitVoxel();
     cout << "begin propagation" << endl;
+    
     //CDT
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
@@ -45,11 +37,12 @@ void Voxel::ComputeDistanceField()
     }
     
     cout << "end propagation"<<endl;
+    
     //Distance fieldの結果を書き出し
     if(cv.GetDim() == 3) WriteBinaryFile(voxel, "DistanceField");//3D
     if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField"); //2D
     
-    //local maximumを探す
+    //forward passでlocal maximumを探す
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
@@ -62,12 +55,58 @@ void Voxel::ComputeDistanceField()
                         y_temp_center.push_back(yy);
                         z_temp_center.push_back(zz);
                         rad_temp_center.push_back(r);
-                        //cout << "x = " << xx << "y = " << yy << "z = " << zz << "r = "<< r << endl;
+                        cout << "xf = " << xx << "yf = " << yy << "zf = " << zz << "rf = "<< r << endl;
                     }
                 }
             }
         }
     }
+    
+    cout << "end forward pass" << endl;
+    /*
+    if(cv.GetDim() == 3) ReadBinaryFile(cv.fileTobeRead);
+    if(cv.GetDim() == 2) ReadFile(cv.fileTobeRead);
+    InitVoxel();
+    
+    //CDT.....ここはVDTにしたほうがいい
+    for(int i = 0; i < x; i++){
+        for (int j = 0; j < y; j++) {
+            for (int k = 0; k < z; k++) {
+                Propagation( voxel , i, j, k, forward); //forward pass
+            }
+        }
+    }
+    
+    for(int i = x-1; i >= 0; i--){
+        for (int j = y-1; j >= 0; j--) {
+            for (int k = z-1; k >= 0; k--) {
+                Propagation( voxel , i, j, k, backward);    //backward pass
+            }
+        }
+    }
+    
+    //backward passでlocal maximumを探す
+    for(int i = x-1; i >= 0; i--){
+        for (int j = y-1; j >= 0; j--) {
+            for (int k = z-1; k >= 0; k--) {
+                if(voxel[i][j][k] + 1.0 >= 0.01){ //除外されていないボクセル,除外は-1になるので
+                    int xx = i; int yy= j; int zz = k; float r(0);
+                    do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
+                    if( r >= minimumRadius )
+                    {
+                        RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
+                        x_temp_center.push_back( xx );
+                        y_temp_center.push_back( yy );
+                        z_temp_center.push_back( zz );
+                        rad_temp_center.push_back( r );
+                        cout << "xb = " << xx << "yb = " << yy << "zb = " << zz << "rb = "<< r << endl;
+                    }
+                }
+            }
+        }
+    }
+    */
+    
     //pairで整理
     cout << "begin matching!" <<endl;
     cout << "number = " << x_temp_center.size() << endl;
@@ -81,9 +120,11 @@ void Voxel::ComputeDistanceField()
     }
     //ラベルごとにソート
     std::sort( data.begin(), data.end() );
-    /*for (int i = 0; i < (int)data.size(); i++) {
+    
+    for (int i = 0; i < (int)data.size(); i++) {
         cout << data[i].first << " : " << data[i].second << endl;
-    }*/
+    }
+    
     //## labelに沿ったマッチング ##//
     std::vector<std::pair<int, int> >::iterator it;
     it = data.begin();
@@ -91,9 +132,11 @@ void Voxel::ComputeDistanceField()
     int head(0);
     int _maxRadiusIndex(0);
     int* _coordinate = new int[3];
+    
     for (int i = 0; i < 3; i ++) {
         _coordinate[i] = 0;
     }
+    
     while (it != data.end())
     {
         head = it_counter;
@@ -103,6 +146,7 @@ void Voxel::ComputeDistanceField()
         _coordinate[0] = x_temp_center[it->second];
         _coordinate[1] = y_temp_center[it->second];
         _coordinate[2] = z_temp_center[it->second];
+        
         //同じラベルを持つ中で、最大の半径をもつ球の半径と座標をまず探す
         while (it->first == _label)
         {
@@ -115,20 +159,23 @@ void Voxel::ComputeDistanceField()
                 _coordinate[1] = y_temp_center[it->second];
                 _coordinate[2] = z_temp_center[it->second];
             }
-            
         }
+        
         //閾値に使う際は最大半径の半分
         cout << "\n";
         cout << "maxRadius = " << _maxRadius << endl;
         cout << "maxRadiusLabel = "<< _maxRadiusIndex << endl;
         cout << "max X = " << _coordinate[0] <<endl;
+        
         for (int i = head; i < it_counter; i++)
         {
             float xx = (float)x_temp_center[data[i].second] - (float)_coordinate[0];
             float yy = (float)y_temp_center[data[i].second] - (float)_coordinate[1];
             float zz = (float)z_temp_center[data[i].second] - (float)_coordinate[2];
             float dis = sqrt(xx*xx + yy*yy + zz*zz);
+            
             cout << "X = " << x_temp_center[data[i].second] << endl;
+            
             //最大半径を持つ球の半径以上離れている場合は半径閾値は使わない
             if(dis > (_maxRadius * 1.2) && data[i].first > 2){
                 cout << "far away  :"<<"label = "<< data[i].first << ", index = "<<data[i].second<<", " << "radius = " << rad_temp_center[data[i].second] <<endl;
@@ -309,6 +356,30 @@ void Voxel::Propagation(float ***table, int x, int y, int z, int direction)
         if(table[x][y][z] + add_dis < table[qx][qy][qz] )//scalarで持っている
         {
             table[qx][qy][qz] = table[x][y][z] + add_dis;
+        }
+    }
+}
+
+void Voxel::InitVoxel(){
+    ConstValue cv;
+    int x(0),y(0),z(0);
+    x = cv.GetX();
+    y = cv.GetY();
+    z = cv.GetZ();
+    //voxelの初期化
+    for(int i = 0; i < x; i++){
+        for (int j = 0; j < y; j++) {
+            for (int k = 0; k < z; k++) {
+                switch((int)voxel[i][j][k]) {
+                    case 0:
+                        voxel[i][j][k] = inf;
+                        break;
+                    case 1:
+                        voxel[i][j][k] = 0;
+                    default:
+                        break;
+                }
+            }
         }
     }
 }

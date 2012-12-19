@@ -30,9 +30,6 @@ int main (int argc, char ** argv)
             
             vox.Labeling(); //ラベリング
             
-            if(cv.GetDim() == 3) vox.ReadBinaryFile(cv.fileTobeRead);
-            if(cv.GetDim() == 2) vox.ReadFile(cv.fileTobeRead);
-            
             vox.ComputeDistanceField(); //距離場計算
             vox.WriteSphere();  //球近似ごの重心と半径の書き出し
             if(cv.GetDim() == 2)system("./regular");//CGALにVoronoiとDelaunayを計算してもらう
