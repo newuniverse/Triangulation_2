@@ -301,6 +301,45 @@ void Voxel::RemoveFromSearchTarget(int x, int y, int z, float r)
     //cout << "end removing!" << endl;
 }
 
+float Voxel::magnitudeOfVector( dvector vec )
+{
+    return sqrt( pow( vec[0], 2) + pow(vec[1], 2) + pow( vec[3], 2 ) );
+}
+
+//VDTプロパゲーション
+void Voxel::VdtPropagation(dvector ***vec, float ***voxel, int x, int y, int z, int direction){
+    dvector q(3);
+    int qx(0), qy(0), qz(0);
+    switch (direction) {
+        case 0:
+            
+            break;
+        case 1:
+            
+            break;
+        case 2:
+            
+            break;
+        case 3:
+            
+            break;
+        case 4:
+            
+            break;
+        case 5:
+            
+            break;
+        case 6:
+            
+            break;
+        case 7:
+            
+            break;
+        default:
+            break;
+    }
+}
+
 //プロパゲーション
 void Voxel::Propagation(float ***table, int x, int y, int z, int direction)
 {
@@ -353,7 +392,7 @@ void Voxel::Propagation(float ***table, int x, int y, int z, int direction)
         }
         if ( !this->isValid(qx,qy,qz) ) continue;
         if( !this->isValid(x,y,z)) continue;
-        if(table[x][y][z] + add_dis < table[qx][qy][qz] )//scalarで持っている
+        if(table[x][y][z] + add_dis < table[qx][qy][qz] )   //scalarで持っている
         {
             table[qx][qy][qz] = table[x][y][z] + add_dis;
         }

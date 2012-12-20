@@ -48,10 +48,16 @@ private:
     int volume_threa = 16;  //pore体積の閾値、これより低いものは無視し、球近似を行わない、書き出さない
     float minimumRadius = 500; //Distance Field計算する際に気孔の半径の閾値として、Labelingしたときに一番小さい半径を選択
     void SearchNeighborVoxel( int*** visitTable, float*** voxel, int& iSum, int& jSum, int& kSum, int& numSum, int labelIndex, queue<int>& xq, queue<int>& yq, queue<int>& zq, std::vector<int>& surface_x, std::vector<int>& surface_y, std::vector<int>& surface_z);   //近傍探索
-    void Propagation(float *** table, int x, int y, int z, int direction);
+    void Propagation(float *** table, int x, int y, int z, int direction);  //CDT
+    
+    void VdtPropagation( dvector ***vec, float***voxel, int x, int y, int z, int direction );   //VDTのプロパゲーション
+    
     bool FindLocalMaximums(float *** table, int& x, int& y, int& z, float& dis);
+    
     void RemoveFromSearchTarget(int x, int y, int z, float r);
+    
     bool isValid(int x, int y, int z);
+    
     //以下Racsac用の関数など
     int max_X_coordinate;
     int max_Y_coordinate;
@@ -65,6 +71,7 @@ private:
     float calculateMatrixElements( int x1, int x2 );
     float calculateVectorElements( int x1, int x2, int y1, int y2 );
     float calculateRadius( dvector center, dvector point);
+    float magnitudeOfVector(dvector vec);
     template<class T> T Max(const T& a, const T& b)
     {
         return ( a > b ) ? ( a ) : ( b );

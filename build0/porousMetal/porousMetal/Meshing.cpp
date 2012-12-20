@@ -21,7 +21,7 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
     dvector replaced_voro(3);   //鈍角三角形の時、球との交点を求める際に三角形外にあるvoronoi vertexを変位させて、ここに格納
     for( int i = 0 ; i < 3; i++ ) ver[i].resize(3);
     
-    for (int i = 0 ; i < 3; i++)
+    for ( int i = 0 ; i < 3; i++ )
     {
         ver[ 0 ][ i ] = ver1[ i ];
         ver[ 1 ][ i ] = ver2[ i ];
