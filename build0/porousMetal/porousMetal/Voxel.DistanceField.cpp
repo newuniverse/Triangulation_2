@@ -5,20 +5,41 @@ void Voxel::ComputeDistanceField()
 {
     cout << "begin distance field!"<< endl;
     
-    int forward(0), backward(1);
-    
     ConstValue cv;
-    int x(0),y(0),z(0);
+    int x(0), y(0), z(0);
     
     x = cv.GetX();
     y = cv.GetY();
     z = cv.GetZ();
     
+    int forward(0), backward(1);    //CDT用
+    enum Paths{ F1 = 0, F2, F3, F4, B1, B2, B3, B4 };      //VDT用
+
+    dvector*** vec = new dvector**[ x ];
+    for (int i = 0; i < x; i++) {
+        vec[ i ] = new dvector*[ y ];
+    }
+    for (int i = 0; i < x; i++) {
+        for (int j = 0; j < y; j++) {
+            vec[ i ][ j ] = new dvector[ z ];
+        }
+    }
+    for (int i = 0; i < x; i++) {
+        for (int j = 0; j < y; j++) {
+            for (int k = 0; k < z; k++) {
+                vec[ i ][ j ][ k ].resize(3);
+                for( int l = 0; l < 3; l++ )
+                    vec[ i ][ j ][ k ][ l ] = 0;
+            }
+        }
+    }
+    
     if(cv.GetDim() == 3) ReadBinaryFile(cv.fileTobeRead);
     if(cv.GetDim() == 2) ReadFile(cv.fileTobeRead);
+    
     InitVoxel();
     cout << "begin propagation" << endl;
-    
+    /*
     //CDT
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
@@ -35,6 +56,80 @@ void Voxel::ComputeDistanceField()
             }
         }
     }
+     */
+    
+    //VDT
+    for(int i = 0; i < x; i++){
+        for (int j = 0; j < y; j++) {
+            for (int k = 0; k < z; k++) {
+                VdtPropagation(vec, voxel, i, j, k, F1);
+                //cout << "F1" <<endl;
+            }
+        }
+    }
+    for(int i = x-1; i >=0 ; i--){
+        for (int j = 0; j < y; j++) {
+            for (int k = 0; k < z; k++) {
+                VdtPropagation(vec, voxel, i, j, k, F2);
+                //cout << "F2" <<endl;
+            }
+        }
+    }
+    
+    for(int i = x-1; i >= 0; i--){
+        for (int j = y-1; j >= 0; j--) {
+            for (int k = 0; k < z; k++) {
+                VdtPropagation(vec, voxel, i, j, k, F3);
+                //cout << "F3" <<endl;
+            }
+        }
+    }
+    
+    for(int i = 0; i < x; i++){
+        for (int j = y-1; j >= 0; j--) {
+            for (int k = 0; k < z; k++) {
+                VdtPropagation(vec, voxel, i, j, k, F4);
+                //cout << "F4" <<endl;
+            }
+        }
+    }
+    
+    for(int i = x-1; i >= 0; i--){
+        for (int j = y-1; j >= 0; j--) {
+            for (int k = z-1; k >= 0; k--) {
+                VdtPropagation(vec, voxel, i, j, k, B1);
+                //cout << "B1" <<endl;
+            }
+        }
+    }
+    
+    for(int i = 0; i < x; i++){
+        for (int j = y-1; j >= 0; j--) {
+            for (int k = z-1; k >= 0; k--) {
+                VdtPropagation(vec, voxel, i, j, k, B2);
+                //cout << "B2" <<endl;
+            }
+        }
+    }
+    
+    for(int i = 0; i < x; i++){
+        for (int j = 0; j < y; j++) {
+            for (int k = z-1; k >= 0; k--) {
+                VdtPropagation(vec, voxel, i, j, k, B3);
+                //cout << "B3" <<endl;
+            }
+        }
+    }
+    
+    for(int i = x-1; i >= 0; i--){
+        for (int j = 0; j < y; j++) {
+            for (int k = z-1; k >= 0; k--) {
+                VdtPropagation(vec, voxel, i, j, k, B4);
+                //cout << "B4" <<endl;
+            }
+        }
+    }
+    
     
     cout << "end propagation"<<endl;
     
@@ -303,40 +398,122 @@ void Voxel::RemoveFromSearchTarget(int x, int y, int z, float r)
 
 float Voxel::magnitudeOfVector( dvector vec )
 {
-    return sqrt( pow( vec[0], 2) + pow(vec[1], 2) + pow( vec[3], 2 ) );
+    return sqrt( pow( vec[ 0 ], 2) + pow( vec[ 1 ], 2) + pow( vec[ 2 ], 2 ) );
 }
 
 //VDTプロパゲーション
 void Voxel::VdtPropagation(dvector ***vec, float ***voxel, int x, int y, int z, int direction){
-    dvector q(3);
-    int qx(0), qy(0), qz(0);
-    switch (direction) {
-        case 0:
-            
+    
+    dvector dir(3);
+    float argmin(1000);
+    //int qx(0), qy(0), qz(0);
+    for ( int i = 0; i < 3; i++){
+        
+        for( int i = 0; i < 3; i++ ) dir[ i ] = inf;//dirの初期化
+        
+        switch (direction) {    //F1, F2, ... B1, B2, ...PATHの分岐
+            case 0: //F1
+                switch (i) {
+                    case 0: dir[ 0 ] = 0; dir[ 1 ] = 0; dir[ 2 ] = -1;
+                        break;
+                    case 1: dir[ 0 ] = 0; dir[ 1 ] = -1; dir[ 2 ] = 0;
+                        break;
+                    case 2: dir[ 0 ] = -1; dir[ 1 ] = 0; dir[ 2 ] = 0;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case 1: //F2
+                switch (i) {
+                    case 0: dir[ 0 ] = 1; dir[ 1 ] = 0; dir[ 2 ] = 0;
+                        break;
+                    case 1: dir[ 0 ] = 0; dir[ 1 ] = -1; dir[ 2 ] = 0;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case 2: //F3
+                switch (i) {
+                    case 0: dir[ 0 ] = 0; dir[ 1 ] = 1; dir[ 2 ] = 0;
+                        break;
+                    case 1: dir[ 0 ] = 1; dir[ 1 ] = 0; dir[ 2 ] = 0;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case 3: //F4
+                switch (i) {
+                    case 0: dir[ 0 ] = -1; dir[ 1 ] = 0; dir[ 2 ] = 0;
+                        break;
+                    case 1: dir[ 0 ] = 0; dir[ 1 ] = 1; dir[ 2 ] = 0;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case 4: //B1
+                switch (i) {
+                    case 0: dir[ 0 ] = 0; dir[ 1 ] = 0; dir[ 2 ] = 1;
+                        break;
+                    case 1: dir[ 0 ] = 0; dir[ 1 ] = 1; dir[ 2 ] = 0;
+                        break;
+                    case 2: dir[ 0 ] = 1; dir[ 1 ] = 0; dir[ 2 ] = 0;
+                        break;
+                    default:
+                        break;
+                }
+
+                break;
+            case 5: //B2
+                switch (i) {
+                    case 0: dir[ 0 ] = -1; dir[ 1 ] = 0; dir[ 2 ] = 0;
+                        break;
+                    case 1: dir[ 0 ] = 0; dir[ 1 ] = 1; dir[ 2 ] = 0;
+                        break;
+                    default:
+                        break;
+                }
+
+                break;
+            case 6: //B3
+                switch (i) {
+                    case 0: dir[ 0 ] = 0; dir[ 1 ] = -1; dir[ 2 ] = 0;
+                        break;
+                    case 1: dir[ 0 ] = -1; dir[ 1 ] = 0; dir[ 2 ] = 0;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case 7: //B4
+                switch (i) {
+                    case 0: dir[ 0 ] = 1; dir[ 1 ] = 0; dir[ 2 ] = 0;
+                        break;
+                    case 1: dir[ 0 ] = 0; dir[ 1 ] = -1; dir[ 2 ] = 0;
+                        break;
+                    default:
+                        break;
+                }
+
+                break;
+            default:
             break;
-        case 1:
-            
-            break;
-        case 2:
-            
-            break;
-        case 3:
-            
-            break;
-        case 4:
-            
-            break;
-        case 5:
-            
-            break;
-        case 6:
-            
-            break;
-        case 7:
-            
-            break;
-        default:
-            break;
+        }
+    
+        if( !this->isValid( x + dir[0] , y + dir[1], z + dir[2])) continue;
+        
+        dvector tempVec(3);
+        tempVec = vec[ x + (int)dir[ 0 ] ][ y + (int)dir[1] ][ z + (int)dir[2] ] + dir;
+        
+        if ( magnitudeOfVector( tempVec ) < argmin && magnitudeOfVector( tempVec ) < voxel[ x ][ y ][ z ] )
+        {
+            argmin = magnitudeOfVector(tempVec);
+            vec[ x ][ y ][ z ] = tempVec;
+            if( argmin < voxel[ x ][ y ][ z ]) voxel[ x ][ y ][ z ] = argmin;
+        }
     }
 }
 
@@ -392,6 +569,7 @@ void Voxel::Propagation(float ***table, int x, int y, int z, int direction)
         }
         if ( !this->isValid(qx,qy,qz) ) continue;
         if( !this->isValid(x,y,z)) continue;
+        
         if(table[x][y][z] + add_dis < table[qx][qy][qz] )   //scalarで持っている
         {
             table[qx][qy][qz] = table[x][y][z] + add_dis;
@@ -399,13 +577,14 @@ void Voxel::Propagation(float ***table, int x, int y, int z, int direction)
     }
 }
 
+//距離場計算のためのvoxelの初期化
 void Voxel::InitVoxel(){
     ConstValue cv;
     int x(0),y(0),z(0);
     x = cv.GetX();
     y = cv.GetY();
     z = cv.GetZ();
-    //voxelの初期化
+    
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {

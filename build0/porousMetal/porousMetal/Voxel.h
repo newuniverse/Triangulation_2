@@ -63,15 +63,22 @@ private:
     int max_Y_coordinate;
     int min_X_coordinate;
     int min_Y_coordinate;
+    
     bool FindSnowManPore(); //SnowMan
     bool Check(float containRate, float rad1, float rad2, float disWithinTwoPoint, dvector b1, dvector b2);
+    
     void ContainRate();
+    
     int Randomize(int range);
+    
     void solveMatrix( dmatrix A, dvector& b);
+    
     float calculateMatrixElements( int x1, int x2 );
     float calculateVectorElements( int x1, int x2, int y1, int y2 );
     float calculateRadius( dvector center, dvector point);
+    
     float magnitudeOfVector(dvector vec);
+    
     template<class T> T Max(const T& a, const T& b)
     {
         return ( a > b ) ? ( a ) : ( b );

@@ -28,6 +28,8 @@ int Voxel::ReadBinaryFile(string filename)
     ConstValue cv;
     int x,y,z;
     x = cv.GetX(); y = cv.GetY(); z = cv.GetZ();
+    if(filename == "") filename = "input.raw";
+    cout << filename.c_str() << endl;
     FILE* in = fopen(filename.c_str(),"rb");
 	if(in == NULL){
 		printf("%sファイルが開けません¥n",filename.c_str());
