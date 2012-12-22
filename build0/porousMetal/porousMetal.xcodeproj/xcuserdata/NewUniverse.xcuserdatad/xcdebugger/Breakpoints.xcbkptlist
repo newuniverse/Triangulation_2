@@ -46,11 +46,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "porousMetal/main.cpp"
-         timestampString = "377585188.428166"
+         timestampString = "377873878.950875"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "229"
-         endingLineNumber = "229">
+         startingLineNumber = "228"
+         endingLineNumber = "228">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -62,32 +62,6 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "2"
          endingLineNumber = "2">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "porousMetal/Voxel.DistanceField.cpp"
-         timestampString = "377587500.082642"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "19"
-         endingLineNumber = "19"
-         landmarkName = "Voxel::ComputeDistanceField()"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "porousMetal/Voxel.DistanceField.cpp"
-         timestampString = "377587500.082642"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "23"
-         endingLineNumber = "23"
-         landmarkName = "Voxel::ComputeDistanceField()"
-         landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -120,24 +94,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "porousMetal/Voxel.DistanceField.cpp"
-         timestampString = "377587500.082642"
+         timestampString = "377885580.146292"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "127"
-         endingLineNumber = "127"
-         landmarkName = "Voxel::ComputeDistanceField()"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "porousMetal/Voxel.DistanceField.cpp"
-         timestampString = "377587500.082642"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "232"
-         endingLineNumber = "232"
+         startingLineNumber = "126"
+         endingLineNumber = "126"
          landmarkName = "Voxel::ComputeDistanceField()"
          landmarkType = "5">
       </FileBreakpoint>
@@ -202,6 +163,84 @@
          startingLineNumber = "151"
          endingLineNumber = "151"
          landmarkName = "Rendering::DrawSphere()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.DistanceField.cpp"
+         timestampString = "377885580.146292"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "172"
+         endingLineNumber = "172"
+         landmarkName = "Voxel::ComputeDistanceField()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.DistanceField.cpp"
+         timestampString = "377885580.146292"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "182"
+         endingLineNumber = "182"
+         landmarkName = "Voxel::ComputeDistanceField()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.DistanceField.cpp"
+         timestampString = "377885580.146292"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "208"
+         endingLineNumber = "208"
+         landmarkName = "Voxel::ComputeDistanceField()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.DistanceField.cpp"
+         timestampString = "377885580.146292"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "115"
+         endingLineNumber = "115"
+         landmarkName = "Voxel::ComputeDistanceField()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.DistanceField.cpp"
+         timestampString = "377885580.146292"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "167"
+         endingLineNumber = "167"
+         landmarkName = "Voxel::ComputeDistanceField()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.DistanceField.cpp"
+         timestampString = "377886895.230529"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "163"
+         endingLineNumber = "163"
+         landmarkName = "Voxel::ComputeDistanceField()"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

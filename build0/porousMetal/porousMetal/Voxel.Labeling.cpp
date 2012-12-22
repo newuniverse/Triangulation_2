@@ -100,7 +100,7 @@ void Voxel::Labeling()
         z_center.push_back(0);
         radius.push_back(0);
     }
-    //Labeling開始　labelの値は2からで、2は外側のすべてのvoxelに割り当てられる
+    //Labeling開始　labelの値は2からで、2は外側(空気部分)のすべてのvoxelに割り当てられる
     queue<int> xq,yq,zq;
     int iSum,jSum,kSum,numSum;  //重心、半径計算用
     for(int i = 0; i < x; i++){
@@ -159,6 +159,7 @@ void Voxel::Labeling()
                         y_center.push_back(yy);
                         z_center.push_back(zz);
                         radius.push_back(r);    //半径
+                        volume.push_back(numSum);   //体積(voxel総数)
                         if(minimumRadius > r) minimumRadius = r;
                     }else{
                         //近似しないのは全て0,0,0,0で統一,Distance field処理後に一斉削除する
@@ -166,6 +167,7 @@ void Voxel::Labeling()
                         y_center.push_back(0);
                         z_center.push_back(0);
                         radius.push_back(0);
+                        volume.push_back(numSum);
                     }
                     surface_x.clear(); surface_y.clear();surface_z.clear();
                     iSum = 0; jSum = 0; kSum = 0; numSum = 0;

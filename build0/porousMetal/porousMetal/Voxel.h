@@ -24,7 +24,7 @@ public:
     enum direction { right = 0, down, left, up, rear, front};   //近傍探索で使う
     Voxel();    //コンストラクタでvoxelをインスタンス化
     void ReadFile(string filename);    //voxelファイル読み込み
-    int ReadBinaryFile(string filename);
+    int ReadBinaryFile(string filename);    
     void WriteBinaryFile();   //voxel書き出し
     void WriteBinaryFile(float ***table, string filename);
     void WriteTextFile(float ***table, string filename);
@@ -39,6 +39,7 @@ private:
     std::vector<float> y_center;
     std::vector<float> z_center;
     std::vector<float> radius;  //半径
+    std::vector<float> volume; //体積
     std::vector<int> x_temp_center;
     std::vector<int> y_temp_center;
     std::vector<int> z_temp_center;
@@ -51,6 +52,8 @@ private:
     void Propagation(float *** table, int x, int y, int z, int direction);  //CDT
     
     void VdtPropagation( dvector ***vec, float***voxel, int x, int y, int z, int direction );   //VDTのプロパゲーション
+    
+    void Vdt();
     
     bool FindLocalMaximums(float *** table, int& x, int& y, int& z, float& dis);
     
