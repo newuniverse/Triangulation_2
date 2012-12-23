@@ -20,13 +20,15 @@ public:
     int GetY();
     int GetZ();
     int GetDim();
+    string GetFileName();
     enum phase{ VOXEL_PROCESSING = 0, VOXEL_DISTANCEFIELD, RENDERING, BOTH};
     int Phase;
     void MovePhase();
-    string fileTobeRead;
+    
 private:
     static  int X_MAX ; //入力ボクセルのx,y,z成分の最大値
     static  int Y_MAX ;
     static  int Z_MAX ;
     static  int DIMENSION;  //1 voxelの解像度
+    static string fileTobeRead;
 };

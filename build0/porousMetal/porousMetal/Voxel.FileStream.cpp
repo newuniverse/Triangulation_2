@@ -62,7 +62,7 @@ void Voxel::ReadFile(string filename)
         //filename;
         ostringstream s ;
         s << k ;
-        if(filename.size() < 5) filename = "input" + s.str() + ".txt";
+        //if(filename.size() < 5) filename = "input" + s.str() + ".txt";
         ifstream fin;
         fin.open(filename.c_str());
         for (int j = 0; j < y; j++)

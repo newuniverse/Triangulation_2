@@ -3,6 +3,7 @@ int ConstValue::X_MAX = 500;
 int ConstValue::Y_MAX = 500;
 int ConstValue::Z_MAX = 500;
 int ConstValue::DIMENSION;
+string ConstValue::fileTobeRead;
 
 void ConstValue::Set(){
     string filename;
@@ -15,6 +16,7 @@ void ConstValue::Set(){
     fin >> DIMENSION;
     fin >> Phase;
     fin >> fileTobeRead;
+    cout << "filetoberead is "<<fileTobeRead<<endl;
     fin.close();
     fin.clear();
 }
@@ -33,6 +35,10 @@ void ConstValue::MovePhase(){
     fout << fileTobeRead;
     fout.close();
     fout.clear();
+}
+
+string ConstValue::GetFileName(){
+    return fileTobeRead;
 }
 
 int ConstValue::GetX(){

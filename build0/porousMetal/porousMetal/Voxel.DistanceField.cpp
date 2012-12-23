@@ -4,7 +4,7 @@
 void Voxel::ComputeDistanceField()
 {
     cout << "begin distance field!"<< endl;
-    int forward(0), backward(1);  //CDT用
+    
     ConstValue cv;
     int x(0), y(0), z(0);
     
@@ -48,8 +48,9 @@ void Voxel::ComputeDistanceField()
     Vdt();
     cout << "end propagation"<<endl;
     /*
-    if(cv.GetDim() == 3) ReadBinaryFile(cv.fileTobeRead);
-    if(cv.GetDim() == 2) ReadFile(cv.fileTobeRead);
+    int forward(0), backward(1);  //CDT用
+    if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName);
+    if(cv.GetDim() == 2) ReadFile(cv.GetFileName);
     InitVoxel();
     /*
     //CDT.....ここはVDTにしたほうがいい
@@ -162,19 +163,19 @@ void Voxel::ComputeDistanceField()
         std::sort( labeledSubGroup.rbegin(), labeledSubGroup.rend()/*, std::greater< float >()*/ );//半径でソート
         
         for (int i = 0; i < (int)labeledSubGroup.size(); i++) {
-            cout << labeledSubGroup[i].first << " : " << labeledSubGroup[i].second << endl;
+            cout << "subgroup = "<<labeledSubGroup[i].first << " : " << labeledSubGroup[i].second << endl;
         }
         
         //もう一度RemoveFromTargetを大きい半径から，するためvoxelを再度初期化
-        //if(cv.GetDim() == 3) ReadBinaryFile(cv.fileTobeRead);
-        //if(cv.GetDim() == 2) ReadFile(cv.fileTobeRead);
+        //if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName);
+        //if(cv.GetDim() == 2) ReadFile(cv.GetFileName);
         
         std::vector<std::pair<float, int> >::iterator subit;
         subit = labeledSubGroup.begin();
         
         //forward & backward pathで見つけた最大半径の球からRemoveFromTargetをしなおして，近似精度を高める
         float spheSumVolume(0);
-        while ( subit != labeledSubGroup.end() || spheSumVolume <= volume[ _label ] ){
+        while ( subit != labeledSubGroup.end() /*&& spheSumVolume <= volume[ _label ]*/ ){
             //RemoveFromSearchTarget( x_temp_center[subit->second], y_temp_center[subit->second], z_temp_center[subit->second], subit->first );
             cout <<  "r index= " << subit->second << " radius = " << subit->first << endl;
             //##ここから　Distance fieldを使った球近似の再修正 ##//
@@ -195,7 +196,7 @@ void Voxel::ComputeDistanceField()
                 x_center[ _label ] = 0;
                 y_center[ _label ] = 0;
                 z_center[ _label ] = 0;
-                radius[ subit->second ] = 0;
+                radius[ _label ] = 0;
                 x_center.push_back(x_temp_center[ subit->second ]);
                 y_center.push_back(y_temp_center[ subit->second ]);
                 z_center.push_back(z_temp_center[ subit->second ]);
@@ -335,7 +336,7 @@ void Voxel::RemoveFromSearchTarget(int x, int y, int z, float r)
     {
         for (float phi = 0.0; phi < 360.0; phi = phi + 1.0)
         {
-            for(float rad = 0.0; rad <= 2.0; rad = rad + 1.0)
+            for(float rad = 0.0; rad <= r; rad = rad + 1.0)
             {
                 int xx = ceil(rad * sin(th) * cos(phi));
                 int yy = ceil(rad * sin(th) * sin(phi));
@@ -384,8 +385,8 @@ void Voxel::Vdt()
         }
     }
     
-    if(cv.GetDim() == 3) ReadBinaryFile(cv.fileTobeRead);
-    if(cv.GetDim() == 2) ReadFile(cv.fileTobeRead);
+    if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName());
+    if(cv.GetDim() == 2) ReadFile(cv.GetFileName());
     
     InitVoxel();
     
@@ -650,7 +651,8 @@ void Voxel::InitVoxel(){
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
-                switch((int)voxel[i][j][k]) {
+                switch((int)voxel[i][j][k])
+                {
                     case 0:
                         voxel[i][j][k] = inf;
                         break;

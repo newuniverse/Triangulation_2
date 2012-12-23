@@ -14,10 +14,10 @@ int main (int argc, char ** argv)
         case cv.VOXEL_PROCESSING:
         {
             Voxel vox;
-            if(cv.GetDim() == 2) vox.ReadFile(cv.fileTobeRead);
-            if(cv.GetDim() == 3) vox.ReadBinaryFile(cv.fileTobeRead);
+            if(cv.GetDim() == 2) vox.ReadFile(cv.GetFileName());
+            if(cv.GetDim() == 3) vox.ReadBinaryFile(cv.GetFileName());
             vox.Labeling(); //ラベリング
-            if(cv.GetDim() == 2)vox.ReadFile(cv.fileTobeRead);
+            if(cv.GetDim() == 2)vox.ReadFile(cv.GetFileName());
             vox.ComputeDistanceField();
             vox.WriteSphere();  //球近似ごの重心と半径の書き出し
             break;
@@ -25,8 +25,8 @@ int main (int argc, char ** argv)
         case cv.VOXEL_DISTANCEFIELD:
         {
             Voxel vox;
-            if(cv.GetDim() == 3) vox.ReadBinaryFile(cv.fileTobeRead); //ボクセル読み込み
-            if(cv.GetDim() == 2) vox.ReadFile(cv.fileTobeRead);
+            if(cv.GetDim() == 3) vox.ReadBinaryFile(cv.GetFileName()); //ボクセル読み込み
+            if(cv.GetDim() == 2) vox.ReadFile(cv.GetFileName());
             
             vox.Labeling(); //ラベリング
             
@@ -51,8 +51,8 @@ int main (int argc, char ** argv)
         case cv.BOTH:
         {
             Voxel vox;
-            ////vox.ReadFile(cv.fileTobeRead); //ボクセル読み込み
-            vox.ReadBinaryFile(cv.fileTobeRead);
+            ////vox.ReadFile(cv.GetFileName()); //ボクセル読み込み
+            vox.ReadBinaryFile(cv.GetFileName());
             vox.Labeling(); //ラベリング
             vox.WriteBinaryFile();    //ラベリング処理後のボクセル書き出し
             vox.WriteSphere();  //球近似ごの重心と半径の書き出し
