@@ -43,7 +43,8 @@ int main (int argc, char ** argv)
             Rendering::InitValues();
             if(cv.GetDim() == 2) Rendering::ReadCoordinate("triangulation.txt");//球、Delaunay、Voronoiの読み込み
             if(cv.GetDim() == 3) Rendering::ReadCoordinate3D("triangulation3D.txt");
-            Rendering::Meshing();
+            
+            //Rendering::Meshing();
             
             //cv.MovePhase();
             Rendering::OpenglRendering(argc, argv);

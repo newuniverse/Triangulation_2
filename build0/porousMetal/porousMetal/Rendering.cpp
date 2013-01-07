@@ -2,6 +2,8 @@
 #pragma comment( lib, "opengl32.lib" )
 #pragma comment( lib, "glu32.lib" )
 #pragma comment( lib, "glaux.lib" )
+#include "ConstValue.h"
+ConstValue cv;
 //Keyboard押した時のフラグ
 bool Rendering::TRI = false;
 bool Rendering::VER = false;
@@ -145,34 +147,86 @@ void Rendering::DrawMesh(){
 //球の描画
 void Rendering::DrawSphere(){   //まだ2D版
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glDisable(GL_LIGHTING);
+    glEnable(GL_LIGHTING);
     float red;
     glColor3f(0.3, 0.1, 0.8);
-    for(int i = 0; i<verN; i++ ){
-        for (float th1 = 0.0;  th1 <= 360.0;  th1 = th1 + 1.0)
+    
+    GLfloat green[] = { 0.0, 1.0, 0.0, 1.0 };
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+    
+    if( cv.GetDim() == 3 )
+    {
+        for (int i = 2; i < verN; i++)
         {
-            if (i < verN/4) {
-                red = 0.2;
-            }else if (red < 2*verN/4){
-                red = 0.4;
-            }else if(red < 3*verN/4){
-                red = 0.6;
-            }else{
-                red = 0.8;
+            glPushMatrix();
+            glTranslatef(ver[ i ][ 0 ], ver[ i ][ 1 ], ver[ i ][ 2 ] );
+            glutSolidSphere(radius[ i ], 16, 16);
+            glPopMatrix();
+            /*
+            for (float th = 0.0; th <= 360.0; th = th + 5.0)
+            {
+                for (float phi = 0.0; phi <= 180.0; phi = phi + 5.0) {
+                    float th2 = th + 15.0;
+                    float th_rad = th / 180.0 * M_PI;
+                    float th2_rad = th2 / 180.0 * M_PI;
+                
+                    float phi2 = phi + 15.0;
+                    float phi_rad = phi / 180.0 * M_PI;
+                    float phi2_rad = phi2 / 180.0 * M_PI;
+                
+                    float x1 = radius[ i ] * cos( th_rad ) * sin( phi_rad );
+                    float x2 = radius[ i ] * cos( th2_rad ) * sin( phi_rad );
+                    float x3 = radius[ i ] * cos( th2_rad ) * sin( phi2_rad );
+                    float x4 = radius[ i ] * cos( th_rad ) * sin( phi2_rad );
+                
+                    float y1 = radius[ i ] * sin( th_rad ) * sin( phi_rad );
+                    float y2 = radius[ i ] * sin( th2_rad ) * sin( phi_rad );
+                    float y3 = radius[ i ] * sin( th2_rad ) * sin( phi2_rad );
+                    float y4 = radius[ i ] * sin( th_rad ) * sin( phi2_rad );
+                
+                    float z1 = radius[ i ] *  cos( phi_rad );
+                    float z2 = radius[ i ] *  cos( phi_rad );
+                    float z3 = radius[ i ] *  cos( phi2_rad );
+                    float z4 = radius[ i ] *  cos( phi2_rad );
+                
+                    glBegin(GL_POLYGON);
+                    glVertex3f( ver[ i ][ 0 ], ver[ i ][ 1 ], ver[ i ][ 2 ] );
+                    glVertex3f( ver[ i ][ 0 ] + x1, ver[ i ][ 1 ] + y1, ver[ i ][ 2 ] + z1 );
+                    glVertex3f( ver[ i ][ 0 ] + x2, ver[ i ][ 1 ] + y2, ver[ i ][ 2 ] + z2 );
+                    glVertex3f( ver[ i ][ 0 ] + x3, ver[ i ][ 1 ] + y3, ver[ i ][ 2 ] + z3 );
+                    glVertex3f( ver[ i ][ 0 ] + x4, ver[ i ][ 1 ] + y4, ver[ i ][ 2 ] + z4 );
+                    glEnd();
+                }
+            }*/
+        }
+    }
+    if( cv.GetDim() == 2 ){
+        for(int i = 0; i < verN; i++ ){
+            for (float th1 = 0.0;  th1 <= 360.0;  th1 = th1 + 1.0)
+            {
+                if (i < verN/4) {
+                    red = 0.2;
+                }else if (red < 2*verN/4){
+                    red = 0.4;
+                }else if(red < 3*verN/4){
+                    red = 0.6;
+                }else{
+                    red = 0.8;
+                }
+                //glColor3f(red, (float)i/verN, 1 - (float)i/verN);
+                float th2 = th1 + 15.0;
+                float th1_rad = th1 / 180.0 * M_PI;
+                float th2_rad = th2 / 180.0 * M_PI;
+                float x1 = radius[i] * cos(th1_rad);
+                float y1 = radius[i] * sin(th1_rad);
+                float x2 = radius[i] * cos(th2_rad);
+                float y2 = radius[i] * sin(th2_rad);
+                glBegin(GL_TRIANGLES);
+                glVertex3f( ver[i][0], ver[i][1], .0 );
+                glVertex3f( x1+ver[i][0], y1+ver[i][1], .0 );
+                glVertex3f( x2+ver[i][0], y2+ver[i][1], .0);
+                glEnd();
             }
-            //glColor3f(red, (float)i/verN, 1 - (float)i/verN);
-            float th2 = th1 + 15.0;
-            float th1_rad = th1 / 180.0 * M_PI;
-            float th2_rad = th2 / 180.0 * M_PI;
-            float x1 = radius[i] * cos(th1_rad);
-            float y1 = radius[i] * sin(th1_rad);
-            float x2 = radius[i] * cos(th2_rad);
-            float y2 = radius[i] * sin(th2_rad);
-            glBegin(GL_TRIANGLES);
-            glVertex3f( ver[i][0], ver[i][1], .0 );
-            glVertex3f( x1+ver[i][0], y1+ver[i][1], .0 );
-            glVertex3f( x2+ver[i][0], y2+ver[i][1], .0);
-            glEnd();
         }
     }
 }
@@ -468,11 +522,11 @@ void Rendering::Reshape(int w, int h)
         glOrtho(-scale/zoom, scale/zoom,
                 -scale * (GLfloat) h / (GLfloat) w /zoom,
                 scale* (GLfloat) h / (GLfloat) w /zoom,
-                -10.0, 10.0);
+                -1000000.0, 100000.0);
     else
         glOrtho(-scale * (GLfloat) w / (GLfloat) h / zoom,
                 scale * (GLfloat) w / (GLfloat) h /zoom,
-                -scale/zoom, scale/zoom, -10.0, 10.0);
+                -scale/zoom, scale/zoom, -100000.0, 100000.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -547,20 +601,20 @@ void Rendering::ReadCoordinate3D(string filename)
     fin >> verN;
     cout << dimension << endl;
     cout << verN << endl;
-    ver = new float*[verN];
-    radius = new float[verN];
-    for (int i = 0;  i < verN; i++)
+    ver = new float*[verN + 1];
+    radius = new float[verN + 1 ];
+    for (int i = 0;  i <= verN; i++)
     {
 		ver[i] = new float[3];
     }
-    for(int i = 1; i < verN; i++){
+    for(int i = 1; i <= verN; i++){
         float* v = ver[i];
         fin >> v[ 0 ];
         fin >> v[ 1 ];
-        fin >> v[ 2 ];   //fin >> v[2];  //3D
+        fin >> v[ 2 ]; 
         fin >> radius[ i ];
-        radius[i] = sqrtf( radius[ i ] );
-        cout << v[0] << " " << v[1] << " " << v[2] << endl;
+        radius[ i ] = sqrtf( radius[ i ] );
+        cout << v[0] << " " << v[1] << " " << v[2] <<  " " << radius[ i ] << endl;
     }
     fin >> triN;
     cout << triN << endl;
