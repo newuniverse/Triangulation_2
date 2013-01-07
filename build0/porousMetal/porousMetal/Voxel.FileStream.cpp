@@ -179,15 +179,29 @@ void Voxel::WriteSphere(){
         for (int i = 1; i < radius.size(); i++)//index = 0は周りの非材料部分, 1からがセル
         {
             if(radius[ i ] < 0) break;
-            if(radius[ i ] != 0 && x_center[i] != 0 ){
-                if( cv.GetDim() == 2 ){
-                fout << x_center[i] << " " << y_center[i]<< " " << radius[i]*radius[i]<< "\n";
+            if(radius[ i ] != 0 && x_center[i] != 0 )
+            {
+                if( cv.GetDim() == 2 )
+                {
+                    fout << x_center[i] << " " << y_center[i]<< " " << radius[i]*radius[i]<< "\n";
                 }
-                if(cv.GetDim() == 3){
+                
+                if(cv.GetDim() == 3)
+                {
                     fout << x_center[i] << " " << y_center[i]<< " " << z_center[i] << " " << radius[i]*radius[i]<< "\n";
                 }
             }
-            
+        }
+        //borderをつける
+        if( cv.GetDim() == 2 )
+        {
+            for( int i = 0; i < ( int )sqrt( radius.size() ); i++ )
+            {
+                fout << 0 << " " << i * (cv.GetY() / sqrt( radius.size() ))  << " " << 0 << "\n";
+                fout << cv.GetX() << " " << i * (cv.GetY() / sqrt( radius.size() )) << " " << 0 << "\n";
+                fout << i * ( cv.GetX() / sqrt( radius.size() ) ) << " " << 0 << " " << 0 << "\n";
+                fout << i * ( cv.GetX() / sqrt( radius.size() ) ) << " " << cv.GetY() << " " << 0 << "\n";
+            }
         }
         //コーナーの2点
         //fout << 0 << " " << cvm.y <<  " " << 0 << "\n";
