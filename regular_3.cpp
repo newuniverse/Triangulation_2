@@ -56,7 +56,7 @@ int main()
     assert( reguTri.dimension() == 3 );
     //OstreamでTriangleの吐き出し
     std::ofstream fout_T;
-    fout_T.open("triangulation.txt");
+    fout_T.open("triangulation3D.txt");
     fout_T << reguTri;
     //cout << reguTri;
     //fout_T << "\n";

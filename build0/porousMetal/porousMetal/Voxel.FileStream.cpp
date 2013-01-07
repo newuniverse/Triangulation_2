@@ -172,9 +172,6 @@ void Voxel::WriteSphere(){
     }
     else
     {
-        //コーナーの2点
-        //fout << 0 << " " << 0 << " "<< 0 << "\n";
-        //fout << cvm.x << " " << 0 << " "<< 0 << "\n";
         //重心点
         for (int i = 1; i < radius.size(); i++)//index = 0は周りの非材料部分, 1からがセル
         {
@@ -193,19 +190,19 @@ void Voxel::WriteSphere(){
             }
         }
         //borderをつける
+        /*
         if( cv.GetDim() == 2 )
         {
-            for( int i = 0; i < ( int )sqrt( radius.size() ); i++ )
+            int division = ( int )sqrt( radius.size());
+            division = 3;
+            for( int i = 0; i < division; i++ )
             {
-                fout << 0 << " " << i * (cv.GetY() / sqrt( radius.size() ))  << " " << 0 << "\n";
-                fout << cv.GetX() << " " << i * (cv.GetY() / sqrt( radius.size() )) << " " << 0 << "\n";
-                fout << i * ( cv.GetX() / sqrt( radius.size() ) ) << " " << 0 << " " << 0 << "\n";
-                fout << i * ( cv.GetX() / sqrt( radius.size() ) ) << " " << cv.GetY() << " " << 0 << "\n";
+                fout << 0 << " " << i * (cv.GetY() / division )  << " " << 1 << "\n";
+                fout << cv.GetX() << " " << i * (cv.GetY() / division) << " " << 1 << "\n";
+                fout << i * ( cv.GetX() / division ) << " " << 0 << " " << 1 << "\n";
+                fout << i * ( cv.GetX() / division ) << " " << cv.GetY() << " " << 1 << "\n";
             }
-        }
-        //コーナーの2点
-        //fout << 0 << " " << cvm.y <<  " " << 0 << "\n";
-        //fout << cvm.x << " " << cvm.y <<  " " << 0 << "\n";
+        }*/
     }
     fout.close();
     fout.clear();

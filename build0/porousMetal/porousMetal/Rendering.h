@@ -35,6 +35,7 @@ public:
     
     //球の座標及び半径の読み込み
     static void ReadCoordinate(string filename);
+    static void ReadCoordinate3D(string filename);
     
     //メッシュ生成
     static void Meshing();
