@@ -538,7 +538,75 @@ void Rendering::Display()
     glutSwapBuffers();
 }
 
-//球の座標、半径データ読み込み
+//球の座標、半径データ読み込み3D ver
+void Rendering::ReadCoordinate3D(string filename)
+{
+    ifstream fin;
+    fin.open(filename.c_str());
+    fin >> dimension;
+    fin >> verN;
+    cout << dimension << endl;
+    cout << verN << endl;
+    ver = new float*[verN];
+    radius = new float[verN];
+    for (int i = 0;  i < verN; i++)
+    {
+		ver[i] = new float[3];
+    }
+    for(int i = 1; i < verN; i++){
+        float* v = ver[i];
+        fin >> v[ 0 ];
+        fin >> v[ 1 ];
+        fin >> v[ 2 ];   //fin >> v[2];  //3D
+        fin >> radius[ i ];
+        radius[i] = sqrtf( radius[ i ] );
+        cout << v[0] << " " << v[1] << " " << v[2] << endl;
+    }
+    fin >> triN;
+    cout << triN << endl;
+    tri = new int*[triN];
+    tri_neighbor = new int*[triN];
+    voro_ver = new float*[triN];
+    for (int i = 0;  i < triN; i++)
+    {
+		tri[i] = new int[4];
+        tri_neighbor[i] = new int[4];
+        voro_ver[i] = new float[3];
+    }
+    
+    cout << "triangle" <<endl;
+    for(int i = 0; i < triN; i++){
+        int* t = tri[i];
+        fin >> t[0];
+        fin >> t[1];
+        fin >> t[2];
+        fin >> t[3];
+        cout << t[0] << " " << t[1] << " " << t[2] << " "<< t[3] << endl;
+    }
+    
+    cout << "triangle neighbor" << endl;
+    for(int i = 0; i < triN; i++){
+        int* n = tri_neighbor[i];
+        fin >> n[0];
+        fin >> n[1];
+        fin >> n[2];
+        fin >> n[3];
+        cout << n[0] << " " << n[1] << " " << n[2] << " "<< n[3] << endl;
+    }
+
+    cout << "Voronoi vertices" << endl;
+    for(int i = 0; i < triN; i++){
+        float* v = voro_ver[i];
+        fin >> v[0];
+        fin >> v[1];
+        fin >> v[2];
+        cout << v[0] << " " << v[1] << " " << v[2] << endl;
+    }
+    fin.close();
+    fin.clear();
+}
+
+//球の座標、半径データ読み込み2D ver
 void Rendering::ReadCoordinate(string filename)
 {
     ifstream fin;

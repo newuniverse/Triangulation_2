@@ -181,6 +181,7 @@ void Voxel::ComputeDistanceField()
             //##ここから　Distance fieldを使った球近似の再修正 ##//
             if (cv.GetDim() == 2) spheSumVolume += M_PI * pow( subit->first, 2 );
             if (cv.GetDim() == 3) spheSumVolume += 4 * M_PI * pow( subit->first, 3 ) / 3;
+            
             //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔 ContainRate < 0.5)
             if(radius[ _label ] == 0) {
                 cout << "pushback0" << endl;
@@ -189,6 +190,7 @@ void Voxel::ComputeDistanceField()
                 z_center.push_back(z_temp_center[ subit->second ]);
                 radius.push_back(rad_temp_center[ subit->second ]);
             }
+            
             //近似されていて登録済みの場合
             else{
                 //まず重心と体積保存近似を消し去る、0にするのはあとで吐き出さない条件で使う
