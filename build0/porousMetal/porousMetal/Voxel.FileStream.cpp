@@ -185,7 +185,9 @@ void Voxel::WriteSphere(){
                 
                 if(cv.GetDim() == 3)
                 {
-                    fout << x_center[i] << " " << y_center[i]<< " " << z_center[i] << " " << radius[i]*radius[i]<< "\n";
+                    if( (float)cv.GetX() - radius[ i ] > 0 ){
+                        fout << x_center[i] << " " << y_center[i]<< " " << z_center[i] << " " << radius[i]*radius[i]<< "\n";
+                    }
                 }
             }
         }

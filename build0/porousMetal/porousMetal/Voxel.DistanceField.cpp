@@ -29,7 +29,7 @@ void Voxel::ComputeDistanceField()
                     int xx = i; int yy= j; int zz = k; float r(0);
                     do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
                     if(r >= minimumRadius && labelLayer[ i ][ j ][ k ] > 2 ) {
-                        RemoveFromSearchTarget(xx, yy, zz, r);  //見つかったら一定範囲を探索範囲から消す
+                        RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
                         x_temp_center.push_back(xx);
                         y_temp_center.push_back(yy);
                         z_temp_center.push_back(zz);
@@ -71,7 +71,7 @@ void Voxel::ComputeDistanceField()
         }
     }
     */
-    /*
+    
     //backward passでlocal maximumを探す
     for(int i = x-1; i >= 0; i--){
         for (int j = y-1; j >= 0; j--) {
@@ -81,7 +81,7 @@ void Voxel::ComputeDistanceField()
                     do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
                     if( r >= minimumRadius && labelLayer[ i ][ j ][ k ] > 2 )
                     {
-                        //RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
+                        RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
                         x_temp_center.push_back( xx );
                         y_temp_center.push_back( yy );
                         z_temp_center.push_back( zz );
@@ -93,7 +93,7 @@ void Voxel::ComputeDistanceField()
         }
     }
     cout << "end backward pass" << endl;
-    */
+    
     //pairで整理
     cout << "begin matching!" <<endl;
     cout << "number = " << x_temp_center.size() << endl;
@@ -181,6 +181,8 @@ void Voxel::ComputeDistanceField()
             //##ここから　Distance fieldを使った球近似の再修正 ##//
             if (cv.GetDim() == 2) spheSumVolume += M_PI * pow( subit->first, 2 );
             if (cv.GetDim() == 3) spheSumVolume += 4 * M_PI * pow( subit->first, 3 ) / 3;
+            
+            cout << "sphere sum = " <<spheSumVolume << " ;label"<< _label <<" true volume = " << volume[ _label ];
             
             //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔 ContainRate < 0.5)
             if(radius[ _label ] == 0) {

@@ -160,7 +160,7 @@ void Rendering::DrawSphere(){   //まだ2D版
         {
             glPushMatrix();
             glTranslatef(ver[ i ][ 0 ], ver[ i ][ 1 ], ver[ i ][ 2 ] );
-            glutSolidSphere(radius[ i ], 16, 16);
+            glutSolidSphere( radius[ i ] , 16, 16);
             glPopMatrix();
             /*
             for (float th = 0.0; th <= 360.0; th = th + 5.0)
@@ -526,7 +526,7 @@ void Rendering::Reshape(int w, int h)
     else
         glOrtho(-scale * (GLfloat) w / (GLfloat) h / zoom,
                 scale * (GLfloat) w / (GLfloat) h /zoom,
-                -scale/zoom, scale/zoom, -100000.0, 100000.0);
+                -scale/zoom, scale/zoom, -1000000.0, 1000000.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -614,7 +614,7 @@ void Rendering::ReadCoordinate3D(string filename)
         fin >> v[ 2 ]; 
         fin >> radius[ i ];
         radius[ i ] = sqrtf( radius[ i ] );
-        cout << v[0] << " " << v[1] << " " << v[2] <<  " " << radius[ i ] << endl;
+        cout << v[0] << " " << v[1] << " " << v[2] <<  " radius = " << radius[ i ] << endl;
     }
     fin >> triN;
     cout << triN << endl;
