@@ -25,18 +25,18 @@ void Voxel::ComputeDistanceField()
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
-                if(voxel[i][j][k] + 1.0 >= 0.01){ //除外されていないボクセル,除外は-1になるので
-                    int xx = i; int yy= j; int zz = k; float r(0);
+                //if( voxel[i][j][k] + 1.0 >= 0.01 ){ //除外されていないボクセル,除外は-1になるので
+                    int xx = i; int yy = j; int zz = k; float r(0);
                     do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
-                    if(r >= minimumRadius && labelLayer[ i ][ j ][ k ] > 2 ) {
-                        RemoveFromSearchTarget( xx, yy, zz, 3 );  //見つかったら一定範囲を探索範囲から消す
-                        x_temp_center.push_back(xx);
-                        y_temp_center.push_back(yy);
-                        z_temp_center.push_back(zz);
-                        rad_temp_center.push_back(r);
+                    if( r >= minimumRadius && labelLayer[ i ][ j ][ k ] > 2 ) {
+                        RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
+                        x_temp_center.push_back( xx );
+                        y_temp_center.push_back( yy );
+                        z_temp_center.push_back( zz );
+                        rad_temp_center.push_back( r );
                         //cout << "xf = " << xx << "yf = " << yy << "zf = " << zz << "rf = "<< r << endl;
                     }
-                }
+                //}
             }
         }
     }
@@ -76,11 +76,12 @@ void Voxel::ComputeDistanceField()
     for(int i = x-1; i >= 0; i--){
         for (int j = y-1; j >= 0; j--) {
             for (int k = z-1; k >= 0; k--) {
-                if(voxel[i][j][k] + 1.0 >= 0.01){ //除外されていないボクセル,除外は-1になるので
+                //if( voxel[i][j][k] + 1.0 >= 0.01){ //除外されていないボクセル,除外は-1になるので
                     int xx = i; int yy= j; int zz = k; float r(0);
                     do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
                     if( r >= minimumRadius && labelLayer[ i ][ j ][ k ] > 2 )
                     {
+                        cout << "backward pass running" << endl;
                         RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
                         x_temp_center.push_back( xx );
                         y_temp_center.push_back( yy );
@@ -88,7 +89,7 @@ void Voxel::ComputeDistanceField()
                         rad_temp_center.push_back( r );
                         //cout << "xb = " << xx << "yb = " << yy << "zb = " << zz << "rb = "<< r << endl;
                     }
-                }
+                //}
             }
         }
     }
@@ -373,7 +374,8 @@ bool Voxel::FindLocalMaximums(float *** table, int& x, int& y, int& z, float& di
         //cout << "x = " << x << " y = " << y << " z = " << z << endl;
         //cout << "qx = " << qx << " qy = " << qy << " qz = " << qz << " i = "<< i << endl;
         //cout << "focus = " << table[x][y][z]<< " search target = " << table[qx][qy][qz] << " current local max = " << local_max_dis << endl;
-        if( table[qx][qy][qz] > table[x][y][z] && table[qx][qy][qz] > local_max_dis) {
+        if( table[qx][qy][qz] > table[x][y][z] && table[qx][qy][qz] > local_max_dis)
+        {
             local_max_dis = table[qx][qy][qz];
             local_max_coordinate[0] = qx;
             local_max_coordinate[1] = qy;
@@ -381,7 +383,7 @@ bool Voxel::FindLocalMaximums(float *** table, int& x, int& y, int& z, float& di
             flag = false;
         }else flag = true;
     }
-    if(flag == false){ x = local_max_coordinate[0]; y = local_max_coordinate[1]; z = local_max_coordinate[2]; dis = local_max_dis;}//探索ボクセルの変更
+    if(flag == false){ x = local_max_coordinate[0]; y = local_max_coordinate[1]; z = local_max_coordinate[2]; dis = local_max_dis;} //探索ボクセルの変更
     return flag;
 }
 
