@@ -29,7 +29,7 @@ void Voxel::ComputeDistanceField()
                     int xx = i; int yy= j; int zz = k; float r(0);
                     do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
                     if(r >= minimumRadius && labelLayer[ i ][ j ][ k ] > 2 ) {
-                        RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
+                        RemoveFromSearchTarget( xx, yy, zz, 3 );  //見つかったら一定範囲を探索範囲から消す
                         x_temp_center.push_back(xx);
                         y_temp_center.push_back(yy);
                         z_temp_center.push_back(zz);
@@ -287,7 +287,47 @@ void Voxel::ComputeDistanceField()
     if(cv.GetDim() == 2) WriteTextFile(voxel, "Matching");
     cout << "end distance field!"<<endl;
 }
-//ローカルマキシマムなボクセルを見つける
+
+
+bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z)
+{
+    int qx(0), qy(0), qz(0);
+    for( int i = 0; i < 25; i++ )
+    {
+        qx = x; qy = y; qz = z;
+        switch (i) {
+            case 0: qx++; break;
+            case 1: qy++; break;
+            case 2: qz++; break;
+            case 3: qx++; qy++; break;
+            case 4: qy++; qz++; break;
+            case 5: qz++; qx++; break;
+            case 6: qx++; qy++; qz++; break;
+            case 7: qx--; break;
+            case 8: qy--; break;
+            case 9: qz--; break;
+            case 10: qx--; qy--; break;
+            case 11: qy--; qz--; break;
+            case 12: qz--; qx--; break;
+            case 13: qx--; qy--; qz--; break;
+            case 14: qx++; qy--; break;
+            case 15: qy--; qz++; break;
+            case 16: qz++; qx--; break;
+            case 17: qx--; qy++; break;
+            case 18: qy++; qz--; break;
+            case 19: qz--; qx++; break;
+            case 20: qx++; qy++; qz--; break;
+            case 21: qx++; qy--; qz--; break;
+            case 22: qx++; qy--; qz++; break;
+            case 23: qx--; qy++; qz++; break;
+            case 24: qx--; qy++; qz--; break;
+            case 25: qx--; qy--; qz++; break;
+            default: break;
+        }
+    }
+}
+
+//ローカルマキシマムなボクセルを見つける(Forward Pass)
 bool Voxel::FindLocalMaximums(float *** table, int& x, int& y, int& z, float& dis)
 {
     //cout << "begin find local maximum!"<<endl;
@@ -295,24 +335,37 @@ bool Voxel::FindLocalMaximums(float *** table, int& x, int& y, int& z, float& di
     int local_max_coordinate[3];
     float local_max_dis(0);
     bool flag(true);
-    for ( int i = 0; i < 13; i++ ) {
+    for ( int i = 0; i < 25; i++ ) {
         qx = x;
         qy = y;
         qz = z;
         switch (i) {    //各方向への探索
-            case 0: qx++; break; //incident face
+            case 0: qx++; break;
             case 1: qy++; break;
             case 2: qz++; break;
-            case 3: qy++; qz--; break; //incident edge
-            case 4: qx++; qy++; break;
-            case 5: qz++; qy++; break;
-            case 6: qx--; qy++; break;
-            case 7: qx--; qz++; break;
-            case 8: qz++; qx++; break;
-            case 9: qy++; qx--; qz--; break; //incident corner
-            case 10:qy++; qx++; qz--; break;
-            case 11:qy++; qx++; qz++; break;
-            case 12:qy++; qx--; qz++; break;
+            case 3: qx++; qy++; break;
+            case 4: qy++; qz++; break;
+            case 5: qz++; qx++; break;
+            case 6: qx++; qy++; qz++; break;
+            case 7: qx--; break;
+            case 8: qy--; break;
+            case 9: qz--; break;
+            case 10: qx--; qy--; break;
+            case 11: qy--; qz--; break;
+            case 12: qz--; qx--; break;
+            case 13: qx--; qy--; qz--; break;
+            case 14: qx++; qy--; break;
+            case 15: qy--; qz++; break;
+            case 16: qz++; qx--; break;
+            case 17: qx--; qy++; break;
+            case 18: qy++; qz--; break;
+            case 19: qz--; qx++; break;
+            case 20: qx++; qy++; qz--; break;
+            case 21: qx++; qy--; qz--; break;
+            case 22: qx++; qy--; qz++; break;
+            case 23: qx--; qy++; qz++; break;
+            case 24: qx--; qy++; qz--; break;
+            case 25: qx--; qy--; qz++; break;
             default: break;
         }
         if( !this->isValid(x,y,z) ) continue;
