@@ -61,8 +61,6 @@ void Voxel::ComputeDistanceField()
         voxel[x][y][z] = -1.0;
     }
 
-    if(cv.GetDim() == 3) WriteBinaryFile(voxel, "Matching");
-    if(cv.GetDim() == 2) WriteTextFile(voxel, "Matching");
        //pairで整理
     cout << "begin matching!" <<endl;
     cout << "number = " << x_temp_center.size() << "; counter = "<< counter <<endl;
@@ -107,11 +105,6 @@ void Voxel::ComputeDistanceField()
         labeledSubGroup.push_back( std::pair<float, int >( rad_temp_center[it->second], it->second ) );
         //####
         
-        _maxRadiusIndex = it->second;
-        _coordinate[0] = x_temp_center[it->second];
-        _coordinate[1] = y_temp_center[it->second];
-        _coordinate[2] = z_temp_center[it->second];
-        
         //同じラベルを持つ中で、最大の半径をもつ球の半径と座標をまず探す
         while (it->first == _label)
         {
@@ -119,14 +112,6 @@ void Voxel::ComputeDistanceField()
             ++it_counter;
             
             labeledSubGroup.push_back( std::pair<float, int>( rad_temp_center[it->second], it->second ) );
-            
-            if (rad_temp_center[it->second] > _maxRadius) {
-                _maxRadius = rad_temp_center[it->second];
-                _maxRadiusIndex = it->second;
-                _coordinate[0] = x_temp_center[it->second];
-                _coordinate[1] = y_temp_center[it->second];
-                _coordinate[2] = z_temp_center[it->second];
-            }
         }
         
         std::sort( labeledSubGroup.rbegin(), labeledSubGroup.rend()/*, std::greater< float >()*/ );//半径でソート
@@ -135,33 +120,53 @@ void Voxel::ComputeDistanceField()
             cout << "subgroup = "<< labeledSubGroup[i].first << " : " << labeledSubGroup[i].second << endl;
         }
         
-        //もう一度RemoveFromTargetを大きい半径から，するためvoxelを再度初期化
-        //if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName);
-        //if(cv.GetDim() == 2) ReadFile(cv.GetFileName);
-        
         std::vector<std::pair<float, int> >::iterator subit;
         subit = labeledSubGroup.begin();
         
-        //forward & backward pathで見つけた最大半径の球からRemoveFromTargetをしなおして，近似精度を高める
         float spheSumVolume(0);
+        dvector focusedLocalMax(3); //島のなかで最大半径をもつ点
+        float focusedRadius(0);
+        focusedLocalMax[ 0 ] = x_temp_center[ labeledSubGroup[ 0 ].second ];
+        focusedLocalMax[ 1 ] = y_temp_center[ labeledSubGroup[ 0 ].second ];
+        focusedLocalMax[ 2 ] = z_temp_center[ labeledSubGroup[ 0 ].second ];
+        focusedRadius = labeledSubGroup[ 0 ].first;
+        
         while ( subit != labeledSubGroup.end() /*&& spheSumVolume <= volume[ _label ]*/ ){
-            //RemoveFromSearchTarget( x_temp_center[subit->second], y_temp_center[subit->second], z_temp_center[subit->second], subit->first );
-            cout <<  "r index= " << subit->second << " radius = " << subit->first << endl;
             //##ここから　Distance fieldを使った球近似の再修正 ##//
-            if (cv.GetDim() == 2) spheSumVolume += M_PI * pow( subit->first, 2 );
-            if (cv.GetDim() == 3) spheSumVolume += 4 * M_PI * pow( subit->first, 3 ) / 3;
+            dvector currentLocalMax( 3 );
+            float currentRadius( 0 );
+            currentLocalMax[ 0 ] = x_temp_center[ subit->second ];
+            currentLocalMax[ 1 ] = y_temp_center[ subit->second ];
+            currentLocalMax[ 2 ] = z_temp_center[ subit->second ];
+            currentRadius = subit->first;
+            bool canWriteSphere( false ); //球を書き出すかのフラグ
+            float disWithinTwoMax = calculateRadius(focusedLocalMax, currentLocalMax);
+            if(subit != labeledSubGroup.begin())
+            {
+                //i) 島が違う最大半径同士の場合，focusedを更新
+                if( disWithinTwoMax > focusedRadius + currentRadius )
+                {
+                    focusedLocalMax = currentLocalMax;
+                    focusedRadius = currentRadius;
+                    canWriteSphere = true;
+                }
+                //ii)同じ島で，二点間距離が大きい方の半径の半分以上，半径以下；更に小さい方の半径が〜〜以上
+                else if( disWithinTwoMax > focusedRadius/2 && disWithinTwoMax < focusedRadius && sqrt(pow(focusedRadius,2) - pow(disWithinTwoMax, 2)) < currentRadius )
+                    canWriteSphere = true;
+                //iii) 同じ島で，二点間距離が大きい方の半径以上
+                else if( disWithinTwoMax > focusedRadius ) canWriteSphere = true;
+            }else canWriteSphere = true;
             
-            cout << "sphere sum = " <<spheSumVolume << " ;label"<< _label <<" true volume = " << volume[ _label ];
-            
-            
-            
-            //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔 ContainRate < 0.5)
+            if( canWriteSphere == true )
+            {
+                RemoveFromSearchTarget(currentLocalMax[0], currentLocalMax[1], currentLocalMax[2], currentRadius);
+                //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔 ContainRate < 0.5)
             if(radius[ _label ] == 0) {
                 cout << "pushback0" << endl;
-                x_center.push_back(x_temp_center[ subit->second ]);
-                y_center.push_back(y_temp_center[ subit->second ]);
-                z_center.push_back(z_temp_center[ subit->second ]);
-                radius.push_back(rad_temp_center[ subit->second ]);
+                x_center.push_back( x_temp_center[ subit->second ]);
+                y_center.push_back( y_temp_center[ subit->second ]);
+                z_center.push_back( z_temp_center[ subit->second ]);
+                radius.push_back( rad_temp_center[ subit->second ]);
             }
             
             //近似されていて登録済みの場合
@@ -176,6 +181,7 @@ void Voxel::ComputeDistanceField()
                 y_center.push_back(y_temp_center[ subit->second ]);
                 z_center.push_back(z_temp_center[ subit->second ]);
                 radius.push_back(rad_temp_center[ subit->second ]);
+            }
             }
             ++subit;
         }
@@ -382,7 +388,7 @@ void Voxel::RemoveFromSearchTarget(int x, int y, int z, float r)
                 int yy = ceil(rad * sin(th) * sin(phi));
                 int zz = ceil(rad * cos(th));
                 if ( !this->isValid(x + xx,y + yy, z + zz) ) continue;
-                voxel[x + xx][y + yy][z + zz] = 1000.0;
+                voxel[x + xx][y + yy][z + zz] = -1.0;
             }
         }
     }
