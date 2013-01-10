@@ -57,7 +57,7 @@ private:
     
     bool FindLocalMaximums(float *** table, int& x, int& y, int& z, float& dis);//fowrward Passで
     
-    bool FindLocalMaximum( float ***table, int&x, int& y, int& z );
+    bool FindLocalMaximum( float ***table, int&x, int& y, int& z, float &dis );
     
     void RemoveFromSearchTarget(int x, int y, int z, float r);
     

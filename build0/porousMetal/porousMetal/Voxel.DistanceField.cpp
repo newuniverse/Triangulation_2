@@ -21,13 +21,23 @@ void Voxel::ComputeDistanceField()
     if(cv.GetDim() == 3) WriteBinaryFile(voxel, "DistanceField");//3D
     if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField"); //2D
     
+    int counter(0);
     //forward passでlocal maximumを探す
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
                 //if( voxel[i][j][k] + 1.0 >= 0.01 ){ //除外されていないボクセル,除外は-1になるので
                     int xx = i; int yy = j; int zz = k; float r(0);
-                    do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
+                    //do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
+                if( FindLocalMaximum( voxel, xx, yy, zz, r ) == true && labelLayer[ i ][ j ][ k ] > 2){
+                    //RemoveFromSearchTarget(xx, yy, zz, r);
+                    x_temp_center.push_back( xx );
+                    y_temp_center.push_back( yy );
+                    z_temp_center.push_back( zz );
+                    rad_temp_center.push_back( r );
+                    counter++;
+                }
+                /*
                     if( r >= minimumRadius && labelLayer[ i ][ j ][ k ] > 2 ) {
                         RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
                         x_temp_center.push_back( xx );
@@ -36,75 +46,33 @@ void Voxel::ComputeDistanceField()
                         rad_temp_center.push_back( r );
                         //cout << "xf = " << xx << "yf = " << yy << "zf = " << zz << "rf = "<< r << endl;
                     }
+                 */
                 //}
             }
         }
     }
     
     cout << "end forward pass" << endl;
-    /*
-    cout << "begin propagation" << endl;
-    //VDTで距離場計算
-    Vdt();
-    cout << "end propagation"<<endl;
-    /*
-    int forward(0), backward(1);  //CDT用
-    if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName);
-    if(cv.GetDim() == 2) ReadFile(cv.GetFileName);
-    InitVoxel();
-    /*
-    //CDT.....ここはVDTにしたほうがいい
-    for(int i = 0; i < x; i++){
-        for (int j = 0; j < y; j++) {
-            for (int k = 0; k < z; k++) {
-                Propagation( voxel , i, j, k, forward); //forward pass
-            }
-        }
+    for (int i = 0; i < (int)x_temp_center.size(); i++)
+    {
+        int x = x_temp_center[ i ];
+        int y = y_temp_center[ i ];
+        int z = z_temp_center[ i ];
+        voxel[x][y][z] = -1.0;
     }
 
-    
-    for(int i = x-1; i >= 0; i--){
-        for (int j = y-1; j >= 0; j--) {
-            for (int k = z-1; k >= 0; k--) {
-                Propagation( voxel , i, j, k, backward);    //backward pass
-            }
-        }
-    }
-    */
-    
-    //backward passでlocal maximumを探す
-    for(int i = x-1; i >= 0; i--){
-        for (int j = y-1; j >= 0; j--) {
-            for (int k = z-1; k >= 0; k--) {
-                //if( voxel[i][j][k] + 1.0 >= 0.01){ //除外されていないボクセル,除外は-1になるので
-                    int xx = i; int yy= j; int zz = k; float r(0);
-                    do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
-                    if( r >= minimumRadius && labelLayer[ i ][ j ][ k ] > 2 )
-                    {
-                        cout << "backward pass running" << endl;
-                        RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
-                        x_temp_center.push_back( xx );
-                        y_temp_center.push_back( yy );
-                        z_temp_center.push_back( zz );
-                        rad_temp_center.push_back( r );
-                        //cout << "xb = " << xx << "yb = " << yy << "zb = " << zz << "rb = "<< r << endl;
-                    }
-                //}
-            }
-        }
-    }
-    cout << "end backward pass" << endl;
-    
-    //pairで整理
+    if(cv.GetDim() == 3) WriteBinaryFile(voxel, "Matching");
+    if(cv.GetDim() == 2) WriteTextFile(voxel, "Matching");
+       //pairで整理
     cout << "begin matching!" <<endl;
-    cout << "number = " << x_temp_center.size() << endl;
+    cout << "number = " << x_temp_center.size() << "; counter = "<< counter <<endl;
     std::vector< std::pair<int, int> > data; //(label, index)を格納
     for (int i = 0; i < (int)x_temp_center.size(); i++)
     {
         int x = x_temp_center[ i ];
         int y = y_temp_center[ i ];
         int z = z_temp_center[ i ];
-        data.push_back( std::pair<int, int>( labelLayer[x][y][z], i ) );
+        data.push_back( std::pair<int, int>( labelLayer[ x ][ y ][ z ], i ) );
     }
     //ラベルごとにソート
     std::sort( data.begin(), data.end() );
@@ -164,7 +132,7 @@ void Voxel::ComputeDistanceField()
         std::sort( labeledSubGroup.rbegin(), labeledSubGroup.rend()/*, std::greater< float >()*/ );//半径でソート
         
         for (int i = 0; i < (int)labeledSubGroup.size(); i++) {
-            cout << "subgroup = "<<labeledSubGroup[i].first << " : " << labeledSubGroup[i].second << endl;
+            cout << "subgroup = "<< labeledSubGroup[i].first << " : " << labeledSubGroup[i].second << endl;
         }
         
         //もう一度RemoveFromTargetを大きい半径から，するためvoxelを再度初期化
@@ -184,6 +152,8 @@ void Voxel::ComputeDistanceField()
             if (cv.GetDim() == 3) spheSumVolume += 4 * M_PI * pow( subit->first, 3 ) / 3;
             
             cout << "sphere sum = " <<spheSumVolume << " ;label"<< _label <<" true volume = " << volume[ _label ];
+            
+            
             
             //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔 ContainRate < 0.5)
             if(radius[ _label ] == 0) {
@@ -290,9 +260,11 @@ void Voxel::ComputeDistanceField()
 }
 
 
-bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z)
+bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z, float &dis)
 {
     int qx(0), qy(0), qz(0);
+    bool flag(true);
+    
     for( int i = 0; i < 25; i++ )
     {
         qx = x; qy = y; qz = z;
@@ -325,7 +297,16 @@ bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z)
             case 25: qx--; qy--; qz++; break;
             default: break;
         }
+        if( !this->isValid( x, y, z ) ) continue;
+        if ( !this->isValid( qx, qy, qz ) ) continue;
+        
+        if( table[ qx ][ qy ][ qz ] <= table[ x ][ y ][ z ] && table[ x ][ y ][ z ] > 0.0)
+        {
+            dis = table[ x ][ y ][ z ];
+        }else flag = false;
     }
+    cout << "flag = " << flag << " x = " << x << " y = " << y << " z = " << z <<endl;
+    return flag;
 }
 
 //ローカルマキシマムなボクセルを見つける(Forward Pass)
@@ -401,7 +382,7 @@ void Voxel::RemoveFromSearchTarget(int x, int y, int z, float r)
                 int yy = ceil(rad * sin(th) * sin(phi));
                 int zz = ceil(rad * cos(th));
                 if ( !this->isValid(x + xx,y + yy, z + zz) ) continue;
-                voxel[x + xx][y + yy][z + zz] = -1.0;
+                voxel[x + xx][y + yy][z + zz] = 1000.0;
             }
         }
     }
