@@ -78,6 +78,10 @@ private:
     
     void solveMatrix( dmatrix A, dvector& b);
     
+    dvector LeastSquareSphere();//最小二乗平均球面の計算
+    float Sum( std::vector<int> surface, int n );
+    float Sum( std::vector<int> surface1, int n1, std::vector<int> surface2, int n2 );
+
     float calculateMatrixElements( int x1, int x2 );
     float calculateVectorElements( int x1, int x2, int y1, int y2 );
     float calculateRadius( dvector center, dvector point);

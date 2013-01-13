@@ -5,6 +5,8 @@
 
 //近傍のボクセルの探索, 1 voxelについての処理
 void Voxel::SearchNeighborVoxel( int*** visitTable, float*** voxel, int& iSum, int& jSum, int& kSum, int& numSum,int labelIndex, queue<int>& xq, queue<int>& yq, queue<int>& zq, std::vector<int>& surface_x, std::vector<int>& surface_y, std::vector<int>& surface_z){
+    
+    bool isSurfaceVoxel(false);
     int qx(0),qy(0),qz(0);
     int poreVoxelCounter(0);
     for (int i = 0; i < 6; i++) {
@@ -34,22 +36,15 @@ void Voxel::SearchNeighborVoxel( int*** visitTable, float*** voxel, int& iSum, i
             yq.push(qy);
             zq.push(qz);
         }
-        if(visitTable[qx][qy][qz] == notVisited || visitTable[qx][qy][qz] == hasVisited)
-        {
-            poreVoxelCounter++;
-        }
+        if( visitTable[qx][qy][qz] == isMaterial ) isSurfaceVoxel = true;
     }
     
     //表面のvoxelを保存
-    if(poreVoxelCounter <= 3){
-       /* //気孔の最大幅を測るため
-        if(max_X_coordinate < xq.front()) max_X_coordinate = xq.front();
-        if(max_Y_coordinate < yq.front()) max_Y_coordinate = yq.front();
-        if(min_X_coordinate > xq.front()) min_X_coordinate = xq.front();
-        if(min_Y_coordinate > yq.front()) min_Y_coordinate = yq.front();*/
-        surface_x.push_back(xq.front());
-        surface_y.push_back(yq.front());
-        surface_z.push_back(zq.front());
+    if(isSurfaceVoxel == true)
+    {
+        surface_x.push_back( xq.front() );
+        surface_y.push_back( yq.front() );
+        surface_z.push_back( zq.front() );
     }
 }
 
@@ -124,28 +119,65 @@ void Voxel::Labeling()
                         xq.pop();   //先頭を除く
                         yq.pop();
                         zq.pop();
+                    }while(!xq.empty()); //queueが空ならループを終える
+                    
+                    //最小二乗平均球面の計算　最小二乗中心法(LSC)
+                    dvector temp;
+                    dvector center(3);
+                    temp = LeastSquareSphere();
+                    float solvedRad(0);
+                    if( cv.GetDim() == 3 ){
+                        for( int i = 0; i < 3; i++ ) center[ i ] = temp[ i ] / (-2);
+                        solvedRad = sqrt( center[ 0 ]*center[ 0 ] + center[ 1 ]*center[ 1 ] + center[ 2 ]*center[ 2 ] - temp[ 3 ] );
                     }
-                    while(!xq.empty()); //queueが空ならループを終える
-                    float xx = ((float)iSum/(float)numSum);
-                    float yy = ((float)jSum/(float)numSum);
-                    float zz = ((float)kSum/(float)numSum);
-                    float r =  sqrt((float)(numSum/M_PI));
+                    if( cv.GetDim() == 2){
+                        for( int i = 0; i < 2; i++ ) center[ i ] = temp[ i ] / (-2);
+                        center[2] = 0;
+                        solvedRad = sqrt( center[ 0 ]*center[ 0 ] + center[ 1 ]*center[ 1 ] - temp[ 2 ] );
+                    }
+                    
+                    float minRadius(1000);
+                    float maxRadius(0);
+                    for (int i = 0; i < (int)surface_x.size(); i++)
+                    {
+                        dvector point(3);
+                        point[ 0 ] = surface_x[ i ];
+                        point[ 1 ] = surface_y[ i ];
+                        point[ 2 ] = surface_z[ i ];
+                        float rad = calculateRadius( center, point );
+                        if( rad > maxRadius) maxRadius = rad;
+                        if( rad < minRadius ) minRadius = rad;
+                    }
+                    //if( (maxRadius - minRadius) / solvedRad < 0.4 )
+                    cout << "center =  "<< center[ 0 ] << " " << center[ 1 ] << " "<< center[ 2 ] << endl;
+                    if(isValid((int)center[ 0 ], (int)center[ 1 ], (int)center[ 2 ])) voxel[ (int)center[ 0 ] ][ (int)center[ 1 ] ][ (int)center[ 2 ] ] = -10;
+                  
+                    
+               /////////////////////////////////////////////////////////////////
+                    
+                    float xx = ( ( float )iSum / ( float )numSum);
+                    float yy = ( ( float )jSum / ( float )numSum );
+                    float zz = ( ( float )kSum / ( float )numSum);
+                    float r =  sqrt( ( float )( numSum / M_PI ) );
                     //内包するvoxel計算
-                    int innerVoxSum(0);
+                    int innerVoxSum( 0 );
                     for(int i = 0; i < surface_x.size(); i++)
                     {
+                        voxel[ surface_x[ i ] ][ surface_y[ i ] ][surface_z[ i ] ] = -10;
                         double dist = sqrt(pow(surface_x[i] - xx, 2) + pow(surface_y[i] - yy, 2));
-                        if(dist < r){
+                        if(dist < r)
+                        {
                             innerVoxSum++;
                         }
                     }
+                    
                     float containRate;
-                    if(surface_x.size() != 0) containRate = ((float)innerVoxSum/surface_x.size());
+                    if( surface_x.size() != 0 ) containRate = ((float)innerVoxSum/surface_x.size());
                     cout << "contain =" << containRate << endl;
                     /**ここからFindSnowmanを入れる,引数にcontainRateの条件を入れて*
                     int findIterationLimit(300);
                     int findTimes(0);*/
-                    if(numSum > volume_threa && containRate > 0.45) //小さすぎる気孔と奇形の気孔は近似しない
+                    if(/*numSum > volume_threa && containRate > 0.45*/ (maxRadius - minRadius) / solvedRad < 0.333 ) //小さすぎる気孔と奇形の気孔は近似しない
                     {
                         /*if (containRate < 0.7) {
                             while(true){
@@ -331,7 +363,7 @@ bool Voxel::Check(float containRate, float rad1, float rad2, float disWithinTwoP
 float Voxel::calculateRadius(dvector center, dvector point){
     dvector temp = center - point;
     float r(0);
-    for (int i= 0; i < 2; i++) {
+    for (int i= 0; i < 3; i++) {
         r += temp[i]*temp[i];
     }
     r = sqrt(r);
@@ -345,8 +377,99 @@ float Voxel::calculateMatrixElements(int x1, int x2){
 float Voxel::calculateVectorElements(int x1, int x2, int y1, int y2){
     return x1*x1 + y1*y1 - (x2*x2 + y2*y2);
 }
+
+dvector Voxel::LeastSquareSphere()
+{
+    ConstValue cv;
+    dvector returnVector;
+    if (cv.GetDim() == 3)
+    {
+        dmatrix A( 4, 4 );
+        dvector b( 4 );
+        A( 0, 0 ) = Sum( surface_x, 2 );
+        A( 0, 1 ) = Sum( surface_x, 1, surface_y, 1 );
+        A( 0, 2 ) = Sum( surface_x, 1, surface_z, 1 );
+        A( 0, 3 ) = Sum( surface_x, 1 );
+        A( 1, 0 ) = Sum( surface_x, 1, surface_y, 1 );
+        A( 1, 1 ) = Sum( surface_y, 2 );
+        A( 1, 2 ) = Sum( surface_y, 1, surface_z, 1 );
+        A( 1, 3 ) = Sum( surface_y, 1 );
+        A( 2, 0 ) = Sum( surface_x, 1, surface_z, 1 );
+        A( 2, 1 ) = Sum( surface_y, 1, surface_z, 1 );
+        A( 2, 2 ) = Sum( surface_z, 2 );
+        A( 2, 3 ) = Sum( surface_z, 1);
+        A( 3, 0 ) = Sum( surface_x, 1 );
+        A( 3, 1 ) = Sum( surface_y, 1 );
+        A( 3, 2 ) = Sum( surface_z, 1);
+        A( 3, 3 ) = surface_x.size();
+        
+        b[ 0 ] = (-1)*(Sum( surface_x, 3 ) + Sum( surface_x, 1, surface_y, 2) + Sum( surface_x, 1, surface_z, 2));
+        b[ 1 ] = (-1)*(Sum( surface_y, 1, surface_x, 2 ) + Sum( surface_y, 3 ) + Sum( surface_y, 1, surface_z, 2 ));
+        b[ 2 ] = (-1)*(Sum( surface_z, 1, surface_x, 2 ) + Sum( surface_z, 1, surface_y, 2 ) + Sum( surface_z, 3 ));
+        b[ 3 ] = (-1)*( Sum( surface_x, 2 ) + Sum( surface_y, 2 ) + Sum( surface_z, 2 ) );
+        
+        try {
+            solveMatrix( A, b );
+        } catch (...) {
+            cout << "solve Matrix failed!" <<endl;
+        }
+        returnVector = b;
+    }
+    if( cv.GetDim() == 2 )
+    {
+        dmatrix A( 3, 3 );
+        dvector b( 3 );
+        A( 0, 0 ) = Sum( surface_x, 2 );
+        A( 0, 1 ) = Sum( surface_x, 1, surface_y, 1 );
+        A( 0, 2 ) = Sum( surface_x, 1 );
+
+        A( 1, 0 ) = Sum( surface_x, 1, surface_y, 1 );
+        A( 1, 1 ) = Sum( surface_y, 2 );
+        A( 1, 2 ) = Sum( surface_y, 1 );
+      
+        A( 2, 0 ) = Sum( surface_x, 1 );
+        A( 2, 1 ) = Sum( surface_y, 1 );
+        A( 2, 2 ) = surface_x.size();
+        
+        
+        b[ 0 ] = (-1)*( Sum( surface_x, 3 ) + Sum( surface_x, 1, surface_y, 2) );
+        b[ 1 ] = (-1)*(Sum( surface_y, 1, surface_x, 2 ) + Sum( surface_y, 3 ) );
+        b[ 2 ] = (-1)*(Sum( surface_x, 2 ) + Sum( surface_y, 2 ) );
+        
+        try {
+            solveMatrix( A, b );
+        } catch (...) {
+            cout << "solve Matrix failed!" <<endl;
+        }
+        returnVector = b;
+    }
+    //cout << returnVector[ 0 ] << " " << returnVector[ 1 ] << " " << returnVector[ 2 ]<<endl;
+    return returnVector;
+}
+
+float Voxel::Sum(std::vector<int> surface, int n)
+{
+    float returnValue(0);
+    for (int i = 0; i < (int)surface.size(); i++) {
+        returnValue += pow((float)surface[ i ], (float)n);
+        //cout << "要素 = "<< pow((float)surface[ i ], (float)n) << "元 = "<< surface[ i ] <<endl;
+    }
+    return returnValue;
+}
+
+float Voxel::Sum(std::vector<int> surface1, int n1, std::vector<int> surface2, int n2 )
+{
+    float returnValue(0);
+    for (int i = 0; i < (int)surface1.size(); i++) {
+        returnValue += ( pow((float)surface1[ i ], (float)n1) * pow((float)surface2[ i ], (float)n2) );
+        //cout << "要素 = "<< pow((float)surface1[ i ], (float)n1) * pow((float)surface2[ i ], (float)n2) <<endl;
+    }
+    return returnValue;
+}
+
 //boostで行列計算
-void Voxel::solveMatrix(dmatrix A, dvector& b){
+void Voxel::solveMatrix(dmatrix A, dvector& b)
+{
     permutation_matrix<> pm(A.size1());
     lu_factorize(A,pm);
     lu_substitute(A,pm,b);

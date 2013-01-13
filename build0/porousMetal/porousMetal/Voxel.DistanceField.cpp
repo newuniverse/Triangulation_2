@@ -271,7 +271,7 @@ bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z, float &dis)
     int qx(0), qy(0), qz(0);
     bool flag(true);
     
-    for( int i = 0; i < 25; i++ )
+    for( int i = 0; i < 26; i++ )
     {
         qx = x; qy = y; qz = z;
         switch (i) {
@@ -323,7 +323,7 @@ bool Voxel::FindLocalMaximums(float *** table, int& x, int& y, int& z, float& di
     int local_max_coordinate[3];
     float local_max_dis(0);
     bool flag(true);
-    for ( int i = 0; i < 25; i++ ) {
+    for ( int i = 0; i < 26; i++ ) {
         qx = x;
         qy = y;
         qz = z;
