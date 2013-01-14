@@ -173,14 +173,14 @@ void Voxel::ComputeDistanceField()
             else{
                 //まず重心と体積保存近似を消し去る、0にするのはあとで吐き出さない条件で使う
                 cout << "pushback1" << endl;
-                x_center[ _label ] = 0;
+                /*x_center[ _label ] = 0;
                 y_center[ _label ] = 0;
                 z_center[ _label ] = 0;
                 radius[ _label ] = 0;
                 x_center.push_back(x_temp_center[ subit->second ]);
                 y_center.push_back(y_temp_center[ subit->second ]);
                 z_center.push_back(z_temp_center[ subit->second ]);
-                radius.push_back(rad_temp_center[ subit->second ]);
+                radius.push_back(rad_temp_center[ subit->second ]);*/
             }
             }
             ++subit;

@@ -29,6 +29,8 @@ public:
     void WriteBinaryFile(float ***table, string filename);
     void WriteTextFile(float ***table, string filename);
     void WriteSphere(); //重心、半径書き出し->CGALに渡す用
+    void WriteCsvData( string filename );
+    std::vector<float> csvContainer; //sphericity deviation
     void Labeling();    //ラベリング
     void ComputeDistanceField();    //距離場計算
 private:

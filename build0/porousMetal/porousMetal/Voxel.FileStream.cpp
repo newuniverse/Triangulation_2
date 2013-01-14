@@ -162,7 +162,25 @@ void Voxel::WriteBinaryFile(float ***table, string filename){
     fclose(out);
 }
 
-void Voxel::WriteSphere(){
+void Voxel::WriteCsvData(string filename)
+{
+    ofstream fout;
+    fout.open(filename.c_str()); //CGALに渡すデータ
+    if(!fout.is_open())
+    {
+        cout << "ファイルをオープンできません" << endl;
+    }
+    else
+    {
+        for (int i = 0; i < (int)csvContainer.size(); i++)
+            fout << csvContainer[ i ] << "\n";
+        fout.close();
+        fout.clear();
+    }
+}
+
+void Voxel::WriteSphere()
+{
     ofstream fout;
     fout.open("regular_input.txt"); //CGALに渡すデータ
     ConstValue cv;

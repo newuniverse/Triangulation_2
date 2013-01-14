@@ -97,7 +97,7 @@ void Voxel::Labeling()
     }
     //Labeling開始　labelの値は2からで、2は外側(空気部分)のすべてのvoxelに割り当てられる
     queue<int> xq,yq,zq;
-    int iSum,jSum,kSum,numSum;  //重心、半径計算用
+    int iSum, jSum, kSum, numSum;  //重心、半径計算用
     for(int i = 0; i < x; i++){
         for(int j = 0; j < y; j++){
             for(int k = 0; k < z; k++){
@@ -148,6 +148,7 @@ void Voxel::Labeling()
                         if( rad > maxRadius) maxRadius = rad;
                         if( rad < minRadius ) minRadius = rad;
                     }
+                    csvContainer.push_back( (maxRadius - minRadius) / solvedRad );
                     //if( (maxRadius - minRadius) / solvedRad < 0.4 )
                     cout << "center =  "<< center[ 0 ] << " " << center[ 1 ] << " "<< center[ 2 ] << endl;
                     if(isValid((int)center[ 0 ], (int)center[ 1 ], (int)center[ 2 ])) voxel[ (int)center[ 0 ] ][ (int)center[ 1 ] ][ (int)center[ 2 ] ] = -10;
@@ -158,12 +159,15 @@ void Voxel::Labeling()
                     float xx = ( ( float )iSum / ( float )numSum);
                     float yy = ( ( float )jSum / ( float )numSum );
                     float zz = ( ( float )kSum / ( float )numSum);
-                    float r =  sqrt( ( float )( numSum / M_PI ) );
+                    float r(0);
+                    if(cv.GetDim() == 2)  r =  sqrt( ( float )( numSum / M_PI ) );
+                    if(cv.GetDim() == 3)  r = pow( 3.0 * (float)numSum / (4.0*M_PI) , 1.0/3.0);
+                    
                     //内包するvoxel計算
                     int innerVoxSum( 0 );
                     for(int i = 0; i < surface_x.size(); i++)
                     {
-                        voxel[ surface_x[ i ] ][ surface_y[ i ] ][surface_z[ i ] ] = -10;
+                        //voxel[ surface_x[ i ] ][ surface_y[ i ] ][surface_z[ i ] ] = -10;
                         double dist = sqrt(pow(surface_x[i] - xx, 2) + pow(surface_y[i] - yy, 2));
                         if(dist < r)
                         {
@@ -177,7 +181,7 @@ void Voxel::Labeling()
                     /**ここからFindSnowmanを入れる,引数にcontainRateの条件を入れて*
                     int findIterationLimit(300);
                     int findTimes(0);*/
-                    if(/*numSum > volume_threa && containRate > 0.45*/ (maxRadius - minRadius) / solvedRad < 0.333 ) //小さすぎる気孔と奇形の気孔は近似しない
+                    if(/*numSum > volume_threa && containRate > 0.45*/ (maxRadius - minRadius) / solvedRad < 0.25 ) //小さすぎる気孔と奇形の気孔は近似しない
                     {
                         /*if (containRate < 0.7) {
                             while(true){
@@ -187,11 +191,11 @@ void Voxel::Labeling()
                             cout << "times = " << findTimes << endl;
                             if(findTimes >= findIterationLimit) cout << "Not Found" << endl;
                         }*/
-                        x_center.push_back(xx); //重心
-                        y_center.push_back(yy);
-                        z_center.push_back(zz);
-                        radius.push_back(r);    //半径
-                        volume.push_back(numSum);   //体積(voxel総数)
+                        x_center.push_back( xx ); //重心
+                        y_center.push_back( yy );
+                        z_center.push_back( zz );
+                        radius.push_back( r );    //半径
+                        volume.push_back( numSum );   //体積(voxel総数)
                         if(minimumRadius > r) minimumRadius = r;
                     }else{
                         //近似しないのは全て0,0,0,0で統一,Distance field処理後に一斉削除する
@@ -210,7 +214,7 @@ void Voxel::Labeling()
         }
     }
     delete [] visitTable;
-    labelLayer = new int**[x];
+    labelLayer = new int**[x];//labelLayerは距離場計算時に参照する
     for (int i = 0;  i < x; i++)
     {
 		labelLayer[i] = new int*[y];
@@ -225,8 +229,11 @@ void Voxel::Labeling()
         for(int j = 0; j < y; j++)
             for(int k = 0; k < z; k++)
                 labelLayer[i][j][k] = voxel[i][j][k];
+    
     if(cv.GetDim() == 2) WriteTextFile(voxel, "labeled");
     if(cv.GetDim() == 3) WriteBinaryFile();
+    WriteCsvData("SphericityDeviation.csv");
+    csvContainer.clear();
     cout << "minimumRadius = "<< minimumRadius <<endl;
 }
 
