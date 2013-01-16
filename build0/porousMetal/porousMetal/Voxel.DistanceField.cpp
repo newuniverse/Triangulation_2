@@ -52,7 +52,7 @@ void Voxel::ComputeDistanceField()
         }
     }
     
-    cout << "end forward pass" << endl;
+    cout << rad_temp_center.size()<<"pair" << endl;
     for (int i = 0; i < (int)x_temp_center.size(); i++)
     {
         int x = x_temp_center[ i ];

@@ -1,0 +1,58 @@
+ushort 128 128 128
+value 0 
+fill
+value 1
+block 4 4 4 120 120 120 
+value 0 
+sphere 10 10 10 5
+value 0 
+sphere 30 15 20 4 
+value 0 
+sphere 20 25 10 8
+value 0 
+sphere 20 45 35 7
+value 0 
+sphere 45 20 50 15
+value 0 
+sphere 30 70 35 10
+value 0 
+sphere 50 50 50 15
+value 0 
+sphere 25 55 85 10
+value 0 
+sphere 100 50 60 9
+value 0 
+sphere 10 100 30 5
+value 0 
+sphere 45 10 110 5
+value 0 
+sphere 55 90 110 9
+value 0 
+sphere 65 100 100 12
+value 0 
+sphere 100 45 100 6
+value 0 
+sphere 90 80 20 10
+value 0 
+sphere 20 40 30 12
+value 0 
+sphere 50 35 40 8 
+value 0 
+sphere 85 70 10 8
+value 0 
+sphere 20 110 20 10
+value 0 
+sphere 45 20 95 9
+value 0 
+sphere 95 85 25 7
+value 0 
+sphere 105 95 110 5
+value 0 
+sphere 30 75 15 12 
+value 0 
+sphere 85 100 15 10
+value 0 
+sphere 65 65 65 20
+value 0 
+sphere 75 25 85 9
+

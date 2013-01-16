@@ -373,5 +373,18 @@
          landmarkName = "Voxel::calculateRadius(dvector center, dvector point)"
          landmarkType = "5">
       </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.DistanceField.cpp"
+         timestampString = "379938788.016232"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "56"
+         endingLineNumber = "56"
+         landmarkName = "Voxel::ComputeDistanceField()"
+         landmarkType = "5">
+      </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>
