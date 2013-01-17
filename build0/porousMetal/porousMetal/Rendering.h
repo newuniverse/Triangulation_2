@@ -75,7 +75,7 @@ private:
     static int *angle_attribute;//鈍角である頂点のインデックスを三角形ごとに保持
     
     static void InitMeshing();  //メッシング前に交点格納配列のメモリ確保
-    static bool CheckObtuseTri(float* ver1, float *ver2, float* ver3, int triIndex);  //鈍角三角形か
+    static bool CheckObtuseTri(float* ver1, float *ver2, float* ver3, float* voro, int triIndex);  //鈍角三角形か
     
     static int CheckPattern(float* ver1, float *ver2, float* ver3, float r1,  float r2, float r3, int triIndex,int label1, int label2, int label3); //Voronoiのパターンをチェック
     
@@ -88,4 +88,7 @@ private:
     static std::vector <float> CalcuCrossPointVoroWithEdge( dvector s_v, dvector l_s_v, dvector voro ); //voronoi vertexと三角形の辺との交点を求める関数、 頂点をstdのvectorとして返す
     static std::vector <float> CalcuCrossIntersectionWithSphere(dvector v_from, dvector v_to, float rad );
     static std::vector <float> CalcuCrossOverlap( dvector ve, dvector vref, dvector voro, float rad );
+    
+    static bool calculateVectorProductSgn( dvector v1, dvector v2 ); //外積計算用の関数
+    static int checkSgn( dvector vec ); //３つの外積の符号の場合わけをチェックし、"鈍角"となっている頂点のインデックスを返す
 };

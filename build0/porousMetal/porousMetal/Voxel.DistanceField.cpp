@@ -61,7 +61,7 @@ void Voxel::ComputeDistanceField()
         voxel[x][y][z] = -1.0;
     }
 
-       //pairで整理
+    //pairで整理
     cout << "begin matching!" <<endl;
     cout << "number = " << x_temp_center.size() << "; counter = "<< counter <<endl;
     std::vector< std::pair<int, int> > data; //(label, index)を格納

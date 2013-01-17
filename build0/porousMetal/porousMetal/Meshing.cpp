@@ -304,14 +304,15 @@ int Rendering::CheckPattern(float *ver1, float *ver2, float *ver3, float r1, flo
 }
 
 //鈍角三角形かの検査 trueかfalseを返す
-bool Rendering::CheckObtuseTri(float* ver1, float *ver2, float* ver3, int triIndex)
+bool Rendering::CheckObtuseTri(float* ver1, float *ver2, float* ver3, float* voro, int triIndex)
 {
+    
     //c2 > a2 + b2;
     float length_1_2(0);
     float length_2_3(0);
     float length_3_1(0);
     bool _returnValue(false);
-    
+    /*
     for (int j = 0; j < 3; j++)
     {
         length_1_2 += pow( ver1[ j ] - ver2[ j ], 2 );
@@ -367,8 +368,49 @@ bool Rendering::CheckObtuseTri(float* ver1, float *ver2, float* ver3, int triInd
         _returnValue = false;
         cout << "Non Obtuse Tri!" << endl;
     }
+    */
+    dvector voro_to_v1( 2 );
+    dvector voro_to_v2( 2 );
+    dvector voro_to_v3( 2 );
+    
+    dvector sgnPattern( 3 );
+    for (int i = 0; i < 2; i++) {
+        voro_to_v1[ i ] = ver1[ i ] - voro[ i ];
+        voro_to_v2[ i ] = ver2[ i ] - voro[ i ];
+        voro_to_v3[ i ] = ver3[ i ] - voro[ i ];
+    }
+    
+    sgnPattern[ 0 ] = calculateVectorProductSgn(voro_to_v2, voro_to_v3 );
+    sgnPattern[ 1 ] = calculateVectorProductSgn(voro_to_v3, voro_to_v1 );
+    sgnPattern[ 2 ] = calculateVectorProductSgn(voro_to_v1, voro_to_v2 );
+    
+    int ver_index;
+    ver_index = checkSgn( sgnPattern );
+    if( ver_index >= 0 )
+    {
+        _returnValue = true;
+        angle_attribute[triIndex] = ver_index;
+    }
+    if( ver_index == -1 ) _returnValue = false;
+    if( ver_index == -2 ) cout << "Irregular Triangle index = " << triIndex << endl;
     
     return _returnValue;
+}
+
+bool Rendering::calculateVectorProductSgn(dvector v1, dvector v2)
+{
+    float s = v1[ 0 ] * v2[ 1 ] - v1[ 1 ]* v2[ 0 ];
+    
+    return ( s > 0 ) ? true : false;      //正数ならtrueを返し、負ならfalse
+}
+
+int Rendering::checkSgn(dvector vec)
+{
+    if( vec[ 0 ] == true && vec[ 1 ] == true && vec[ 2 ] == true ) return -1;   //Voronoi点が三角形内でレギュラーな場合
+    else if(vec[ 0 ] == false && vec[ 1 ] == true && vec[ 2 ] == true) return 0;    //0番目頂点の向かいの領域にVoronoi点がはみ出ている
+    else if(vec[ 0 ] == true && vec[ 1 ] == false && vec[ 2 ] == true) return 1;
+    else if(vec[ 0 ] == true && vec[ 1 ] == true && vec[ 2 ] == false) return 2;
+    else return -2;             //Voronoi点がS"領域内にいる場合はイレギュラー
 }
 
 //初期化
@@ -436,7 +478,7 @@ void Rendering::Meshing(){
             {
                 //PushVoroVerIntoTri(float *ver1, float *ver2, float *ver3, float r1, float r2, float r3, float *voro_ver)
             }*/
-            Generate_Mesh(v1, v2, v3, voroVer, i, CheckPattern( v1, v2, v3, r1, r2, r3, i, 0, 0, 0 ), CheckObtuseTri( v1, v2, v3, i ));
+            Generate_Mesh(v1, v2, v3, voroVer, i, CheckPattern( v1, v2, v3, r1, r2, r3, i, 0, 0, 0 ), CheckObtuseTri( v1, v2, v3, voroVer, i ));
 
         }
     }
