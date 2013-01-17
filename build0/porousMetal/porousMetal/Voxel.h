@@ -90,6 +90,8 @@ private:
     
     float magnitudeOfVector(dvector vec);
     
+    bool RemoveSphereFromOutputCandidate( dvector focus, float focusRad, dvector candidate, float candidateRad );
+    
     template<class T> T Max(const T& a, const T& b)
     {
         return ( a > b ) ? ( a ) : ( b );

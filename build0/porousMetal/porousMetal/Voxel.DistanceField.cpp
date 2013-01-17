@@ -110,38 +110,75 @@ void Voxel::ComputeDistanceField()
         {
             ++it;
             ++it_counter;
-            
             labeledSubGroup.push_back( std::pair<float, int>( rad_temp_center[it->second], it->second ) );
         }
         
         std::sort( labeledSubGroup.rbegin(), labeledSubGroup.rend() );//半径でソート
-        
+        //確認
         for (int i = 0; i < (int)labeledSubGroup.size(); i++) {
             //cout << "subgroup = "<< labeledSubGroup[i].first << " : " << labeledSubGroup[i].second << endl;
         }
         
-        std::vector<std::pair<float, int> >::iterator subit;
+        
+        std::vector<std::pair<float, int> >::iterator subit;    //サブグループのイタレータ
         subit = labeledSubGroup.begin();
         
         float spheSumVolume(0);
         dvector focusedLocalMax(3); //島のなかで最大半径をもつ点
         float focusedRadius(0);
-        focusedLocalMax[ 0 ] = x_temp_center[ labeledSubGroup[ 0 ].second ];
-        focusedLocalMax[ 1 ] = y_temp_center[ labeledSubGroup[ 0 ].second ];
-        focusedLocalMax[ 2 ] = z_temp_center[ labeledSubGroup[ 0 ].second ];
-        focusedRadius = labeledSubGroup[ 0 ].first;
+        //focusedLocalMax[ 0 ] = x_temp_center[ labeledSubGroup[ 0 ].second ];
+        //focusedLocalMax[ 1 ] = y_temp_center[ labeledSubGroup[ 0 ].second ];
+        //focusedLocalMax[ 2 ] = z_temp_center[ labeledSubGroup[ 0 ].second ];
+        //focusedRadius = labeledSubGroup[ 0 ].first;
         
         while ( subit != labeledSubGroup.end() /*&& spheSumVolume <= volume[ _label ]*/ ){
             //##ここから　Distance fieldを使った球近似の再修正 ##//
             dvector currentLocalMax( 3 );
             float currentRadius( 0 );
-            currentLocalMax[ 0 ] = x_temp_center[ subit->second ];
-            currentLocalMax[ 1 ] = y_temp_center[ subit->second ];
-            currentLocalMax[ 2 ] = z_temp_center[ subit->second ];
-            currentRadius = subit->first;
             bool canWriteSphere( false ); //球を書き出すかのフラグ
-            float disWithinTwoMax = calculateRadius(focusedLocalMax, currentLocalMax);
-            if(subit != labeledSubGroup.begin())
+            float disWithinTwoMax;
+            
+            focusedLocalMax[ 0 ] = x_temp_center[ subit->second ];
+            focusedLocalMax[ 1 ] = y_temp_center[ subit->second ];
+            focusedLocalMax[ 2 ] = z_temp_center[ subit->second ];
+            focusedRadius = subit->first;
+            
+            //currentLocalMax[ 0 ] = x_temp_center[ subit->second ];
+            //currentLocalMax[ 1 ] = y_temp_center[ subit->second ];
+            //currentLocalMax[ 2 ] = z_temp_center[ subit->second ];
+            //currentRadius = subit->first;
+            
+            disWithinTwoMax = calculateRadius(focusedLocalMax, currentLocalMax);
+            std::vector<std::pair<float, int> >::iterator dist_cal_it;                  ///######これもlabeledSubGroupのイテレータで定義するべき
+            dist_cal_it = subit;
+            
+            //focusしている最大球との削除判定をそれ以外の球について調べる
+            while (dist_cal_it != labeledSubGroup.end()) {
+                dist_cal_it++;                          ///##############################新しくlabeledSubGroupのsubgroupを作ってそれに出力していい
+                currentLocalMax[ 0 ] = x_temp_center[ dist_cal_it->second ];
+                currentLocalMax[ 1 ] = y_temp_center[ dist_cal_it->second ];
+                currentLocalMax[ 2 ] = z_temp_center[ dist_cal_it->second ];
+                currentRadius = dist_cal_it->first;
+                if( RemoveSphereFromOutputCandidate(focusedLocalMax, focusedRadius, currentLocalMax, currentRadius) == true)
+                {
+                    labeledSubGroup.erase(dist_cal_it);
+                }
+            }
+            
+            RemoveFromSearchTarget(focusedLocalMax[0], focusedLocalMax[1], focusedLocalMax[2], focusedRadius);
+            //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔 ContainRate < 0.5)
+            if(radius[ _label ] == 0) {
+                cout << "pushback0" << endl;
+                x_center.push_back( x_temp_center[ subit->second ]);
+                y_center.push_back( y_temp_center[ subit->second ]);
+                z_center.push_back( z_temp_center[ subit->second ]);
+                radius.push_back( rad_temp_center[ subit->second ]);
+            }
+
+            
+            
+            /*
+            if(subit != labeledSubGroup.begin()) //labeledSubGroup.begin()は全体に対して最大の半径を持つ球だからこの判定は必要ない
             {
                 //i) 島が違う最大半径同士の場合，focusedを更新
                 if( disWithinTwoMax > focusedRadius + currentRadius )
@@ -173,17 +210,19 @@ void Voxel::ComputeDistanceField()
             else{
                 //まず重心と体積保存近似を消し去る、0にするのはあとで吐き出さない条件で使う
                 cout << "pushback1" << endl;
-                /*x_center[ _label ] = 0;
-                y_center[ _label ] = 0;
-                z_center[ _label ] = 0;
-                radius[ _label ] = 0;
-                x_center.push_back(x_temp_center[ subit->second ]);
-                y_center.push_back(y_temp_center[ subit->second ]);
-                z_center.push_back(z_temp_center[ subit->second ]);
-                radius.push_back(rad_temp_center[ subit->second ]);*/
+                //x_center[ _label ] = 0;
+                //y_center[ _label ] = 0;
+                //z_center[ _label ] = 0;
+                //radius[ _label ] = 0;
+                //x_center.push_back(x_temp_center[ subit->second ]);
+                //y_center.push_back(y_temp_center[ subit->second ]);
+                //z_center.push_back(z_temp_center[ subit->second ]);
+                //radius.push_back(rad_temp_center[ subit->second ]);
             }
             }
+             
             ++subit;
+             */
         }
         
         labeledSubGroup.clear();
@@ -265,6 +304,18 @@ void Voxel::ComputeDistanceField()
     cout << "end distance field!"<<endl;
 }
 
+
+bool Voxel::RemoveSphereFromOutputCandidate(dvector focus, float focusRad, dvector candidate, float candidateRad)
+{
+    float disWithinTwo;
+    bool returnValue( false );
+    disWithinTwo = calculateRadius(focus, candidate);
+    if( disWithinTwo < focusRad )
+    {
+        if( candidateRad < sqrt( focusRad*focusRad - disWithinTwo*disWithinTwo )  ) returnValue = true;
+    }
+    return returnValue;
+}
 
 bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z, float &dis)
 {
