@@ -114,10 +114,10 @@ void Voxel::ComputeDistanceField()
             labeledSubGroup.push_back( std::pair<float, int>( rad_temp_center[it->second], it->second ) );
         }
         
-        std::sort( labeledSubGroup.rbegin(), labeledSubGroup.rend()/*, std::greater< float >()*/ );//半径でソート
+        std::sort( labeledSubGroup.rbegin(), labeledSubGroup.rend() );//半径でソート
         
         for (int i = 0; i < (int)labeledSubGroup.size(); i++) {
-            cout << "subgroup = "<< labeledSubGroup[i].first << " : " << labeledSubGroup[i].second << endl;
+            //cout << "subgroup = "<< labeledSubGroup[i].first << " : " << labeledSubGroup[i].second << endl;
         }
         
         std::vector<std::pair<float, int> >::iterator subit;
@@ -311,7 +311,7 @@ bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z, float &dis)
             dis = table[ x ][ y ][ z ];
         }else flag = false;
     }
-    cout << "flag = " << flag << " x = " << x << " y = " << y << " z = " << z <<endl;
+    //cout << "flag = " << flag << " x = " << x << " y = " << y << " z = " << z <<endl;
     return flag;
 }
 

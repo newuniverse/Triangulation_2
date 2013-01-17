@@ -265,7 +265,7 @@ void Rendering::DrawTri()
         glVertex3fv(ver[t[2]]);
     }
         glEnd();
-    
+    /*
     //今の三角形のメッシュを描く
     int i(0);
     i = nextTriCounter;

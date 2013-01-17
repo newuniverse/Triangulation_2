@@ -190,6 +190,25 @@ void Voxel::WriteSphere()
     }
     else
     {
+        //borderをつける
+        if( cv.GetDim() == 2 )
+        {
+            int division = ( int )sqrt( radius.size());
+            //division = 3;
+            float x, y ,z, r;
+            for( int i = 0; i < division; i++ )
+            {
+                x = 0.0 + 0.01 ; y = 1.0*(i + 1) * (cv.GetY() / division ) + 0.01 ; r = 1.0+0.01;
+                fout << x << " " << y  << " " << r << "\n";
+                x = 1.0*cv.GetX() + 0.01 ; y = 1.0*(i + 1) * (cv.GetY() / division ) + 0.01; r = 1.0+0.01;
+                fout << x << " " << y  << " " << r << "\n";
+                x = 1.0 * (i + 1) * ( cv.GetX() / division )+0.01; y = 0.0+0.01; r = 1.0+0.01;
+                fout << x << " " << y  << " " << r << "\n";
+                x = 1.0 * (i + 1) * ( cv.GetX() / division ) + 0.01; y = 1.0*cv.GetY() + 0.01; r = 1.0+0.01;
+                fout << x << " " << y  << " " << r << "\n";
+            }
+        }
+        
         //重心点
         for (int i = 1; i < radius.size(); i++)//index = 0は周りの非材料部分, 1からがセル
         {
@@ -209,20 +228,6 @@ void Voxel::WriteSphere()
                 }
             }
         }
-        //borderをつける
-        /*
-        if( cv.GetDim() == 2 )
-        {
-            int division = ( int )sqrt( radius.size());
-            division = 3;
-            for( int i = 0; i < division; i++ )
-            {
-                fout << 0 << " " << i * (cv.GetY() / division )  << " " << 1 << "\n";
-                fout << cv.GetX() << " " << i * (cv.GetY() / division) << " " << 1 << "\n";
-                fout << i * ( cv.GetX() / division ) << " " << 0 << " " << 1 << "\n";
-                fout << i * ( cv.GetX() / division ) << " " << cv.GetY() << " " << 1 << "\n";
-            }
-        }*/
     }
     fout.close();
     fout.clear();
