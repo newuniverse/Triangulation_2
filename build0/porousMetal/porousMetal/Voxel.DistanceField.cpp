@@ -13,295 +13,138 @@ void Voxel::ComputeDistanceField()
     z = cv.GetZ();
     
     cout << "begin propagation" << endl;
-    //VDTで距離場計算
-    Vdt();
-    cout << "end propagation"<<endl;
+    //##########ここからループに
     
-    //Distance fieldの結果を書き出し
-    if(cv.GetDim() == 3) WriteBinaryFile(voxel, "DistanceField");//3D
-    if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField"); //2D
+    bool continueToLoop( true );
+   
+    int loopCount( 0 );
+    while (continueToLoop == true) {
+        loopCount++;
+        cout << "loop count = "<< loopCount <<endl;
+        //step1####################################################
+        cout << "step1: Propagation" << endl;
+        //VDTで距離場計算
+        Vdt();
     
-    int counter(0);
-    //forward passでlocal maximumを探す
-    for(int i = 0; i < x; i++){
-        for (int j = 0; j < y; j++) {
-            for (int k = 0; k < z; k++) {
-                //if( voxel[i][j][k] + 1.0 >= 0.01 ){ //除外されていないボクセル,除外は-1になるので
+        //Distance fieldの結果を書き出し
+        if(cv.GetDim() == 3) WriteBinaryFile(voxel, "DistanceField");//3D
+        if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField"); //2D
+    
+        //step2 ####################################################
+        cout << "step2: Find LocalMaximum" << endl;
+        //Raster scanでlocal maximumを探す
+        for(int i = 0; i < x; i++)
+        {
+            for (int j = 0; j < y; j++)
+            {
+                for (int k = 0; k < z; k++)
+                {
                     int xx = i; int yy = j; int zz = k; float r(0);
-                    //do{} while (FindLocalMaximums(voxel, xx, yy, zz, r) != true);  //propagation方向で探す
-                if( FindLocalMaximum( voxel, xx, yy, zz, r ) == true && labelLayer[ i ][ j ][ k ] > 2){
-                    //RemoveFromSearchTarget(xx, yy, zz, r);
-                    x_temp_center.push_back( xx );
-                    y_temp_center.push_back( yy );
-                    z_temp_center.push_back( zz );
-                    rad_temp_center.push_back( r );
-                    counter++;
-                }
-                /*
-                    if( r >= minimumRadius && labelLayer[ i ][ j ][ k ] > 2 ) {
-                        RemoveFromSearchTarget( xx, yy, zz, r );  //見つかったら一定範囲を探索範囲から消す
+                    if( FindLocalMaximum( voxel, xx, yy, zz, r ) == true && labelLayer[ i ][ j ][ k ] > 2)
+                    {
+                    
                         x_temp_center.push_back( xx );
                         y_temp_center.push_back( yy );
                         z_temp_center.push_back( zz );
                         rad_temp_center.push_back( r );
-                        //cout << "xf = " << xx << "yf = " << yy << "zf = " << zz << "rf = "<< r << endl;
+                    
                     }
-                 */
-                //}
+                }
             }
         }
-    }
-    
+    /*
     cout << rad_temp_center.size()<<"pair" << endl;
+    
     for (int i = 0; i < (int)x_temp_center.size(); i++)
     {
         int x = x_temp_center[ i ];
         int y = y_temp_center[ i ];
         int z = z_temp_center[ i ];
         voxel[x][y][z] = -1.0;
-    }
-
-    //pairで整理
-    cout << "begin matching!" <<endl;
-    cout << "number = " << x_temp_center.size() << "; counter = "<< counter <<endl;
-    std::vector< std::pair<int, int> > data; //(label, index)を格納
-    for (int i = 0; i < (int)x_temp_center.size(); i++)
-    {
-        int x = x_temp_center[ i ];
-        int y = y_temp_center[ i ];
-        int z = z_temp_center[ i ];
-        data.push_back( std::pair<int, int>( labelLayer[ x ][ y ][ z ], i ) );
-    }
-    //ラベルごとにソート
-    std::sort( data.begin(), data.end() );
-    
-    //## ここまででラベルでソートされている ##//
-    
+    }*/
+        //step3 ####################################################
+        //RemoveFromSearchTarget + register sphere
+        //pairで整理
+        cout << "step3: RemoveTarget and Rigister" << endl;
+        std::vector< std::pair<int, int> > data; //(label, index)を格納
+        for (int i = 0; i < (int)x_temp_center.size(); i++)
+        {
+            int x = x_temp_center[ i ];
+            int y = y_temp_center[ i ];
+            int z = z_temp_center[ i ];
+            data.push_back( std::pair<int, int>( labelLayer[ x ][ y ][ z ], i ) );
+        }
+        //ラベルごとにソート
+        std::sort( data.begin(), data.end() );
+    /*
     for (int i = 0; i < (int)data.size(); i++) {
         cout << data[i].first << " : " << data[i].second << endl;
-    }
+    }*/
     
-    //## labelに沿ったマッチング ##//
-    std::vector<std::pair<int, int> >::iterator it; //(label, index)のイテレータ
-    it = data.begin();
+        //## labelに沿ったマッチング ##//
+        std::vector<std::pair<int, int> >::iterator it; //(label, index)のイテレータ
+        it = data.begin();
     
-    int it_counter(0);
-    int head(0);
-    int _maxRadiusIndex(0);
-    int* _coordinate = new int[3];
-    
-    for (int i = 0; i < 3; i ++) {
-        _coordinate[i] = 0;
-    }
-    
-    while (it != data.end())
-    {
-        head = it_counter;
-        int _label = it->first;
-        float _maxRadius = rad_temp_center[it->second];
-        
-        //####
-        std::vector< std::pair< float, int > > labeledSubGroup; //ラベルごとの再近似用円のサブグループ(radius, index)を格納
-        labeledSubGroup.push_back( std::pair<float, int >( rad_temp_center[it->second], it->second ) );
-        //####
-        
-        //同じラベルを持つ中で、最大の半径をもつ球の半径と座標をまず探す
-        while (it->first == _label)
+        int it_counter(0);
+        int head(0);
+        bool trueSignEvenOnce( false );
+        //すべての気孔にたいするループ
+        while (it != data.end())
         {
-            ++it;
-            ++it_counter;
-            labeledSubGroup.push_back( std::pair<float, int>( rad_temp_center[it->second], it->second ) );
-        }
+            head = it_counter;
+            int _label = it->first;
         
-        std::sort( labeledSubGroup.rbegin(), labeledSubGroup.rend() );//半径でソート
-        //確認
-        for (int i = 0; i < (int)labeledSubGroup.size(); i++) {
-            //cout << "subgroup = "<< labeledSubGroup[i].first << " : " << labeledSubGroup[i].second << endl;
-        }
+            //####
+            std::vector< std::pair< float, int > > labeledSubGroup; //ラベルごとの再近似用円のサブグループ(radius, index)を格納
+            labeledSubGroup.push_back( std::pair<float, int >( rad_temp_center[it->second], it->second ) );
+            //####
         
-        
-        std::vector<std::pair<float, int> >::iterator subit;    //サブグループのイタレータ
-        subit = labeledSubGroup.begin();
-        
-        float spheSumVolume(0);
-        dvector focusedLocalMax(3); //島のなかで最大半径をもつ点
-        float focusedRadius(0);
-        //focusedLocalMax[ 0 ] = x_temp_center[ labeledSubGroup[ 0 ].second ];
-        //focusedLocalMax[ 1 ] = y_temp_center[ labeledSubGroup[ 0 ].second ];
-        //focusedLocalMax[ 2 ] = z_temp_center[ labeledSubGroup[ 0 ].second ];
-        //focusedRadius = labeledSubGroup[ 0 ].first;
-        
-        while ( subit != labeledSubGroup.end() /*&& spheSumVolume <= volume[ _label ]*/ ){
-            //##ここから　Distance fieldを使った球近似の再修正 ##//
-            dvector currentLocalMax( 3 );
-            float currentRadius( 0 );
-            bool canWriteSphere( false ); //球を書き出すかのフラグ
-            float disWithinTwoMax;
-            
-            focusedLocalMax[ 0 ] = x_temp_center[ subit->second ];
-            focusedLocalMax[ 1 ] = y_temp_center[ subit->second ];
-            focusedLocalMax[ 2 ] = z_temp_center[ subit->second ];
-            focusedRadius = subit->first;
-            
-            //currentLocalMax[ 0 ] = x_temp_center[ subit->second ];
-            //currentLocalMax[ 1 ] = y_temp_center[ subit->second ];
-            //currentLocalMax[ 2 ] = z_temp_center[ subit->second ];
-            //currentRadius = subit->first;
-            
-            disWithinTwoMax = calculateRadius(focusedLocalMax, currentLocalMax);
-            std::vector<std::pair<float, int> >::iterator dist_cal_it;                  ///######これもlabeledSubGroupのイテレータで定義するべき
-            dist_cal_it = subit;
-            
-            //focusしている最大球との削除判定をそれ以外の球について調べる
-            while (dist_cal_it != labeledSubGroup.end()) {
-                dist_cal_it++;                          ///##############################新しくlabeledSubGroupのsubgroupを作ってそれに出力していい
-                currentLocalMax[ 0 ] = x_temp_center[ dist_cal_it->second ];
-                currentLocalMax[ 1 ] = y_temp_center[ dist_cal_it->second ];
-                currentLocalMax[ 2 ] = z_temp_center[ dist_cal_it->second ];
-                currentRadius = dist_cal_it->first;
-                if( RemoveSphereFromOutputCandidate(focusedLocalMax, focusedRadius, currentLocalMax, currentRadius) == true)
-                {
-                    labeledSubGroup.erase(dist_cal_it);
-                }
-            }
-            
-            RemoveFromSearchTarget(focusedLocalMax[0], focusedLocalMax[1], focusedLocalMax[2], focusedRadius);
-            //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔 ContainRate < 0.5)
-            if(radius[ _label ] == 0) {
-                cout << "pushback0" << endl;
-                x_center.push_back( x_temp_center[ subit->second ]);
-                y_center.push_back( y_temp_center[ subit->second ]);
-                z_center.push_back( z_temp_center[ subit->second ]);
-                radius.push_back( rad_temp_center[ subit->second ]);
-            }
-
-            
-            
-            /*
-            if(subit != labeledSubGroup.begin()) //labeledSubGroup.begin()は全体に対して最大の半径を持つ球だからこの判定は必要ない
+            //ラベルにそったサブグループへの振り分け
+            while (it->first == _label)
             {
-                //i) 島が違う最大半径同士の場合，focusedを更新
-                if( disWithinTwoMax > focusedRadius + currentRadius )
+                ++it;
+                ++it_counter;
+                labeledSubGroup.push_back( std::pair<float, int>( rad_temp_center[it->second], it->second ) );
+            }
+            //半径でソート
+            std::sort( labeledSubGroup.rbegin(), labeledSubGroup.rend() );
+        
+            std::vector<std::pair<float, int> >::iterator subit;    //サブグループのイタレータ
+            subit = labeledSubGroup.begin();
+        
+            //SubGroupについてのループ
+            while ( subit != labeledSubGroup.end() ){
+                //##ここから　Distance fieldを使った球近似の再修正 ##//
+                dvector currentLocalMax( 3 );
+                float currentRadius( 0 );
+                float disWithinTwoMax;
+            
+                currentLocalMax[ 0 ] = x_temp_center[ subit->second ];
+                currentLocalMax[ 1 ] = y_temp_center[ subit->second ];
+                currentLocalMax[ 2 ] = z_temp_center[ subit->second ];
+                currentRadius = rad_temp_center[ subit->second ];
+                //Removeして球を登録
+                RemoveFromSearchTarget(currentLocalMax[0], currentLocalMax[1], currentLocalMax[2], currentRadius );
+                if(radius[ _label ] == 0 && currentRadius > minimumRadius * 30 )
                 {
-                    focusedLocalMax = currentLocalMax;
-                    focusedRadius = currentRadius;
-                    canWriteSphere = true;
+                    //continueToLoop = true;
+                    trueSignEvenOnce = true;
+                    x_center.push_back( currentLocalMax[ 0 ]);
+                    y_center.push_back( currentLocalMax[ 1 ]);
+                    z_center.push_back( currentLocalMax[ 2 ]);
+                    radius.push_back( currentRadius );
                 }
-                //ii)同じ島で，二点間距離が大きい方の半径の半分以上，半径以下；更に小さい方の半径が〜〜以上
-                else if( disWithinTwoMax > focusedRadius/2 && disWithinTwoMax < focusedRadius && sqrt(pow(focusedRadius,2) - pow(disWithinTwoMax, 2)) < currentRadius )
-                    canWriteSphere = true;
-                //iii) 同じ島で，二点間距離が大きい方の半径以上
-                else if( disWithinTwoMax > focusedRadius ) canWriteSphere = true;
-            }else canWriteSphere = true;
-            
-            if( canWriteSphere == true )
-            {
-                RemoveFromSearchTarget(currentLocalMax[0], currentLocalMax[1], currentLocalMax[2], currentRadius);
-                //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔 ContainRate < 0.5)
-            if(radius[ _label ] == 0) {
-                cout << "pushback0" << endl;
-                x_center.push_back( x_temp_center[ subit->second ]);
-                y_center.push_back( y_temp_center[ subit->second ]);
-                z_center.push_back( z_temp_center[ subit->second ]);
-                radius.push_back( rad_temp_center[ subit->second ]);
+                subit++;
             }
-            
-            //近似されていて登録済みの場合
-            else{
-                //まず重心と体積保存近似を消し去る、0にするのはあとで吐き出さない条件で使う
-                cout << "pushback1" << endl;
-                //x_center[ _label ] = 0;
-                //y_center[ _label ] = 0;
-                //z_center[ _label ] = 0;
-                //radius[ _label ] = 0;
-                //x_center.push_back(x_temp_center[ subit->second ]);
-                //y_center.push_back(y_temp_center[ subit->second ]);
-                //z_center.push_back(z_temp_center[ subit->second ]);
-                //radius.push_back(rad_temp_center[ subit->second ]);
-            }
-            }
-             
-            ++subit;
-             */
+            labeledSubGroup.clear();
         }
-        
-        labeledSubGroup.clear();
-        /*
-        //閾値に使う際は最大半径の半分
-        cout << "\n";
-        cout << "maxRadius = " << _maxRadius << endl;
-        cout << "maxRadiusLabel = "<< _maxRadiusIndex << endl;
-        cout << "max X = " << _coordinate[0] <<endl;
-        
-        //同ラベルの先頭に戻ってコンストレインをかける
-        for (int i = head; i < it_counter; i++)
-        {
-            float xx = (float)x_temp_center[data[i].second] - (float)_coordinate[0];
-            float yy = (float)y_temp_center[data[i].second] - (float)_coordinate[1];
-            float zz = (float)z_temp_center[data[i].second] - (float)_coordinate[2];
-            float dis = sqrt(xx*xx + yy*yy + zz*zz);
-            
-            cout << "X = " << x_temp_center[data[i].second] << endl;
-            
-            //最大半径を持つ球の半径以上離れている場合は半径閾値は使わない
-            if(dis > (_maxRadius * 1.2) && data[i].first > 2){
-                cout << "far away  :"<<"label = "<< data[i].first << ", index = "<<data[i].second<<", " << "radius = " << rad_temp_center[data[i].second] <<endl;
-                voxel[x_temp_center[data[i].second]][y_temp_center[data[i].second]][z_temp_center[data[i].second]] = -100;//local maximumの表示
-                
-                //##ここから　Distance fieldを使った球近似の再修正 ##//
-                //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔 ContainRate < 0.5)
-                if(radius[data[i].first] == 0) {
-                    x_center.push_back(x_temp_center[data[i].second]);
-                    y_center.push_back(y_temp_center[data[i].second]);
-                    z_center.push_back(z_temp_center[data[i].second]);
-                    radius.push_back(rad_temp_center[data[i].second]);
-                }
-                //近似されていて登録済みの場合
-                else{
-                    //まず重心と体積保存近似を消し去る、0にするのはあとで吐き出さない条件で使う
-                    x_center[data[i].first ] = 0;
-                    y_center[data[i].first ] = 0;
-                    z_center[data[i].first ] = 0;
-                    radius[data[i].first] = 0;
-                    x_center.push_back(x_temp_center[data[i].second]);
-                    y_center.push_back(y_temp_center[data[i].second]);
-                    z_center.push_back(z_temp_center[data[i].second]);
-                    radius.push_back(rad_temp_center[data[i].second]);
-                }
-            }
-            //最大半径閾値使う
-            else if(rad_temp_center[ data[i].second ] > (3*_maxRadius/5) && data[i].first > 2) {
-                cout << "very close:"<<"label = "<< data[i].first << ", index = "<<data[i].second<<", "<< "radius = " << rad_temp_center[data[i].second] <<endl;
-                voxel[x_temp_center[data[i].second]][y_temp_center[data[i].second]][z_temp_center[data[i].second]] = -100;
-                //##ここから　Distance fieldを使った球近似の再修正 ##//
-                //あるlabelに登録されている半径が0の場合(近似条件に合わなかった気孔)
-                if(radius[data[i].first] == 0) {
-                    x_center.push_back(x_temp_center[data[i].second]);
-                    y_center.push_back(y_temp_center[data[i].second]);
-                    z_center.push_back(z_temp_center[data[i].second]);
-                    radius.push_back(rad_temp_center[data[i].second]);
-                }
-                //近似されていて登録済みの場合
-                else{
-                    //まず重心と体積保存近似を消し去る、0にするのはあとで吐き出さない条件で使う
-                    x_center[data[i].first ] = 0;
-                    y_center[data[i].first ] = 0;
-                    z_center[data[i].first ] = 0;
-                    radius[data[i].first] = 0;
-                    x_center.push_back(x_temp_center[data[i].second]);
-                    y_center.push_back(y_temp_center[data[i].second]);
-                    z_center.push_back(z_temp_center[data[i].second]);
-                    radius.push_back(rad_temp_center[data[i].second]);
-                }
-            }
-        }
-       */
+        if( trueSignEvenOnce == true ) continueToLoop = true;
+        else continueToLoop = false;
     }
-         
-    delete[] _coordinate;
+    
     if(cv.GetDim() == 3) WriteBinaryFile(voxel, "Matching");
     if(cv.GetDim() == 2) WriteTextFile(voxel, "Matching");
-    cout << "end distance field!"<<endl;
+    cout << "loop count = "<< loopCount <<endl;
 }
 
 
@@ -357,7 +200,7 @@ bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z, float &dis)
         if( !this->isValid( x, y, z ) ) continue;
         if ( !this->isValid( qx, qy, qz ) ) continue;
         
-        if( table[ qx ][ qy ][ qz ] <= table[ x ][ y ][ z ] && table[ x ][ y ][ z ] > 0.0)
+        if( table[ qx ][ qy ][ qz ] < table[ x ][ y ][ z ] && table[ x ][ y ][ z ] > 0.0)
         {
             dis = table[ x ][ y ][ z ];
         }else flag = false;
@@ -366,7 +209,7 @@ bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z, float &dis)
     return flag;
 }
 
-//ローカルマキシマムなボクセルを見つける(Forward Pass)
+//ローカルマキシマムなボクセルを見つける(Forward Pass)(旧ver)
 bool Voxel::FindLocalMaximums(float *** table, int& x, int& y, int& z, float& dis)
 {
     //cout << "begin find local maximum!"<<endl;
@@ -439,7 +282,7 @@ void Voxel::RemoveFromSearchTarget(int x, int y, int z, float r)
                 int yy = ceil(rad * sin(th) * sin(phi));
                 int zz = ceil(rad * cos(th));
                 if ( !this->isValid(x + xx,y + yy, z + zz) ) continue;
-                voxel[x + xx][y + yy][z + zz] = -1.0;
+                voxel[x + xx][y + yy][z + zz] = 0.0;
             }
         }
     }
