@@ -60,7 +60,7 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
             }
         }
         
-        cout << "cross point = "<< vec[0] << ", " << vec[1]<<", "<< vec[2]<< endl;
+        //cout << "cross point = "<< vec[0] << ", " << vec[1]<<", "<< vec[2]<< endl;
         cross4Points_index[ tri_index ][ 0 ][ 0 ] = crossPointIndex; //triに計算した交点のインデックスを登録
         
         //##  neighbor triへの登録  ##//
@@ -95,7 +95,7 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
             }
         }
         
-        cout << "cross point = "<< vec[0] << ", " << vec[1]<<", "<< vec[2]<< endl;
+        //cout << "cross point = "<< vec[0] << ", " << vec[1]<<", "<< vec[2]<< endl;
         //cross4Points_coord.push_back( CalcuCrossPointVoroWithEdge( ver[2], ver[0], voro ) );
         cross4Points_index[ tri_index ][ 1 ][ 0 ] = crossPointIndex; 
         //##  neighbor triへの登録  ##//
@@ -127,7 +127,7 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
                 replaced_voro[ i ] = vec[ i ];
             }
         }
-        cout << "cross point = "<< vec[0] << ", " << vec[1]<<", "<< vec[2]<< endl;
+        //cout << "cross point = "<< vec[0] << ", " << vec[1]<<", "<< vec[2]<< endl;
         //cross4Points_coord.push_back( CalcuCrossPointVoroWithEdge( ver[1], ver[0], voro ) );
         cross4Points_index[ tri_index ][ 2 ][ 0 ] = crossPointIndex; //tri番号登録
         
@@ -172,13 +172,13 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
                 cross4Points_index[ tri_index ][ i ][ l + 1 ] = crossPointIndex;  //triに計算した交点のインデックスを登録
                 //cross4Points_coord.push_back( vec );    //計算した交点を入れる              //##*************ここに問題アリ、正しくpush_backされていない*********##//
                 //neiに登録は今のところしない
-                cout << "cross 3point = "<< vec[ 0 ] << ", " << vec[ 1 ]<<", "<< vec[ 2 ]<< endl;
+                //cout << "cross 3point = "<< vec[ 0 ] << ", " << vec[ 1 ]<<", "<< vec[ 2 ]<< endl;
                 
                 crossPointIndex++;
             }
         }
     }
-    cout << "crossPointIndex = "<< crossPointIndex << endl; //debug用これが12の倍数ならOK!
+    //cout << "crossPointIndex = "<< crossPointIndex << endl; //debug用これが12の倍数ならOK!
     ver_oppsite_overlapSph.clear();
 }
 #pragma end rigion intersection with spheres
@@ -220,9 +220,9 @@ std::vector <float> Rendering::CalcuCrossIntersectionWithSphere(dvector v_from, 
     for (int i = 0; i < 3; i++)
     {
         temp[ i ] = v_from[ i ] + rad * ( v_to[i] - v_from[i] )/norm;
-        cout << "temp = " << temp[i] << ", ";
+        //cout << "temp = " << temp[i] << ", ";
     }
-    cout << "\n";
+    //cout << "\n";
     return temp;
 }
 
@@ -239,9 +239,9 @@ std::vector<float> Rendering::CalcuCrossPointVoroWithEdge(dvector s_v, dvector l
     for (int i = 0; i < 3; i++)
     {
         temp[ i ] = s_coeff * s_v[ i ] + ( 1 - s_coeff ) * l_s_v[ i ];
-        cout <<  temp[i] << ", ";
+        //cout <<  temp[i] << ", ";
     }
-    cout << "\n";
+    //cout << "\n";
     return temp;
 }
 
@@ -252,7 +252,7 @@ int Rendering::CheckPattern(float *ver1, float *ver2, float *ver3, float r1, flo
     float length_1_2(0);//頂点1-2のつくるエッジの長さ
     float length_2_3(0);
     float length_3_1(0);
-    
+    int overlapCounter(0); //オーバーラップしている球の組みの数をカウント
     for (int j = 0; j < 3; j++) {
         length_1_2 += pow(ver1[j] - ver2[j], 2);
         length_2_3 += pow(ver2[j] - ver3[j], 2);
@@ -266,36 +266,44 @@ int Rendering::CheckPattern(float *ver1, float *ver2, float *ver3, float r1, flo
     _return_value = NORMAL;
     //labelが一緒ならOverlapとみなし、違うならSaparateする
     if(r2 + r3 >= length_2_3){
-        if(label2 != label3) _return_value = SEPARATE;
-        else _return_value = OVERLAP;
+        /*if(label2 != label3) _return_value = SEPARATE;
+        else*/
+        _return_value = OVERLAP;
         tri_attribute[ triIndex ][ 3 ] = true;
         tri_attribute[ triIndex ][ 0 ] = true;
         ver_oppsite_overlapSph.push_back(0);
+        overlapCounter++;
     }
     
     if(r3 + r1 >= length_3_1){
-        if(label3 != label1) _return_value = SEPARATE;
-        else _return_value = OVERLAP;
+        /*if(label3 != label1) _return_value = SEPARATE;
+        else*/
+        _return_value = OVERLAP;
         tri_attribute[ triIndex ][ 3 ] = true;
         tri_attribute[ triIndex ][ 1 ] = true;
         ver_oppsite_overlapSph.push_back(1);
+        overlapCounter++;
     }
     
     if(r1 + r2 >= length_1_2){
-        if(label1 != label2) _return_value = SEPARATE;
-        else _return_value = OVERLAP;
+        /*if(label1 != label2) _return_value = SEPARATE;
+        else*/
+        _return_value = OVERLAP;
         tri_attribute[ triIndex ][ 3 ] = true;
         tri_attribute[ triIndex ][ 2 ] = true;
         ver_oppsite_overlapSph.push_back(2);
+        overlapCounter++;
     }
+    
+    if( overlapCounter == 3) _return_value = IRREGULAR; //３つの円が相互に交わる場合
     
     switch (_return_value) {
         case NORMAL:
             cout << "NORMAL Tri!" << endl; break;
         case OVERLAP:
             cout << "OVERLAP Tri!" << endl; break;
-        case SEPARATE:
-            cout << "SEPARATE Tri!" << endl; break;
+        case IRREGULAR:
+            cout << "3OVERLAPS Tri!" << endl; break;
         default:
             break;
     }
@@ -312,63 +320,7 @@ bool Rendering::CheckObtuseTri(float* ver1, float *ver2, float* ver3, float* vor
     float length_2_3(0);
     float length_3_1(0);
     bool _returnValue(false);
-    /*
-    for (int j = 0; j < 3; j++)
-    {
-        length_1_2 += pow( ver1[ j ] - ver2[ j ], 2 );
-        length_2_3 += pow( ver2[ j ] - ver3[ j ], 2 );
-        length_3_1 += pow( ver3[ j ] - ver1[ j ], 2 );
-    }
     
-    //鈍角を見つけてその頂点インデックスを代入
-    int obtuseIndex(0);
-    if( length_2_3 > length_1_2 ) {
-        if (length_2_3 > length_3_1) {
-            obtuseIndex = 0;
-        }else obtuseIndex = 1;
-    }else{
-        if(length_1_2 > length_3_1){
-            obtuseIndex = 2;
-        }else obtuseIndex = 1;
-    }
-    
-    
-    //sort 最大の辺をバブルソートでlength_1_2に入れる
-    float max(0); //sortの入れ替え用
-    if( length_2_3 > length_1_2 )
-    {
-        max = length_2_3;
-        length_2_3 = length_1_2;
-        length_1_2 = max;
-    }
-    
-    if( length_3_1 > length_2_3 )
-    {
-        max = length_3_1;
-        length_3_1 = length_2_3;
-        length_2_3 = max;
-    }
-    
-    if( length_2_3 > length_1_2 )
-    {
-        max = length_2_3;
-        length_2_3 = length_1_2;
-        length_1_2 = max;
-    }
-    
-    if( length_1_2 >= length_2_3 + length_3_1 )
-    {
-        //鈍角になっている頂点の番号を入れる(0 ~ 2)
-        angle_attribute[triIndex] = obtuseIndex;
-        _returnValue = true;
-        cout << "Obtuse Tri!" << endl;
-    }
-    else
-    {
-        _returnValue = false;
-        cout << "Non Obtuse Tri!" << endl;
-    }
-    */
     dvector voro_to_v1( 2 );
     dvector voro_to_v2( 2 );
     dvector voro_to_v3( 2 );
@@ -473,13 +425,10 @@ void Rendering::Meshing(){
             float r1 = radius[tri[i][0]];
             float r2 = radius[tri[i][1]];
             float r3 = radius[tri[i][2]];
-            
-            /*if( CheckObtuseTri( v1, v2, v3, i ) == true ) //鈍角三角形かのチェック
-            {
-                //PushVoroVerIntoTri(float *ver1, float *ver2, float *ver3, float r1, float r2, float r3, float *voro_ver)
-            }*/
-            Generate_Mesh(v1, v2, v3, voroVer, i, CheckPattern( v1, v2, v3, r1, r2, r3, i, 0, 0, 0 ), CheckObtuseTri( v1, v2, v3, voroVer, i ));
-
+            int pattern = CheckPattern( v1, v2, v3, r1, r2, r3, i, 0, 0, 0 );
+            bool isVoroVerOutside = CheckObtuseTri( v1, v2, v3, voroVer, i );
+            if( pattern != IRREGULAR )//３つの円ともオーバーラップならメッシングしない
+            Generate_Mesh(v1, v2, v3, voroVer, i, pattern, isVoroVerOutside );
         }
     }
 }

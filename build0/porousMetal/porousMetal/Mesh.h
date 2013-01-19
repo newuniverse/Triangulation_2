@@ -17,7 +17,7 @@ public:
     int crossPointIndex = 0;
     bool isObtuseTri;
     std::vector<int> obtuseAngleIndex; 
-    enum Pattern{ NORMAL = 0, SEPARATE, OVERLAP, IRREGULAR }; //メッシングパターンのフラグ
+    enum Pattern{ NORMAL = 0, SEPARATE, OVERLAP, IRREGULAR, NOMESH }; //メッシングパターンのフラグ
     void Init();
     bool CheckObtuseTri(float* ver1, float *ver2, float* ver3);  //鈍角三角形か
     void PushVoroVerIntoTri(float* ver1, float* ver2, float* ver3, float r1,  float r2, float r3, float* voro_ver); //isObtuseがtrueの時に
