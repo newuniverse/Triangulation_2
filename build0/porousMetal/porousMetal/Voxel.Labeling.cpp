@@ -54,6 +54,7 @@ void Voxel::Labeling()
     srand((unsigned int)time(NULL));
     //visitTableの確保
     ConstValue cv;
+    totalPoreVolume = 0;
     int x,y,z;
     x = cv.GetX();
     y = cv.GetY();
@@ -151,7 +152,8 @@ void Voxel::Labeling()
                     csvContainer.push_back( (maxRadius - minRadius) / solvedRad );
                     //if( (maxRadius - minRadius) / solvedRad < 0.4 )
                     cout << "center =  "<< center[ 0 ] << " " << center[ 1 ] << " "<< center[ 2 ] << endl;
-                    if(isValid((int)center[ 0 ], (int)center[ 1 ], (int)center[ 2 ])) voxel[ (int)center[ 0 ] ][ (int)center[ 1 ] ][ (int)center[ 2 ] ] = -10;
+                    //最小二乗平均球の中心を描く
+                    //if(isValid((int)center[ 0 ], (int)center[ 1 ], (int)center[ 2 ])) voxel[ (int)center[ 0 ] ][ (int)center[ 1 ] ][ (int)center[ 2 ] ] = -10;
                   
                     
                /////////////////////////////////////////////////////////////////
@@ -163,47 +165,24 @@ void Voxel::Labeling()
                     if(cv.GetDim() == 2)  r =  sqrt( ( float )( numSum / M_PI ) );
                     if(cv.GetDim() == 3)  r = pow( 3.0 * (float)numSum / (4.0*M_PI) , 1.0/3.0);
                     
-                    //内包するvoxel計算
-                    int innerVoxSum( 0 );
-                    for(int i = 0; i < surface_x.size(); i++)
-                    {
-                        //voxel[ surface_x[ i ] ][ surface_y[ i ] ][surface_z[ i ] ] = -10;
-                        double dist = sqrt(pow(surface_x[i] - xx, 2) + pow(surface_y[i] - yy, 2));
-                        if(dist < r)
+                    if(labelIndex > 2){
+                        if( numSum > volume_threa &&  (maxRadius - minRadius) / solvedRad < 0.25 ) //小さすぎる気孔と奇形の気孔は近似しない
                         {
-                            innerVoxSum++;
+                            x_center.push_back( xx ); //重心
+                            y_center.push_back( yy );
+                            z_center.push_back( zz );
+                            radius.push_back( r );    //半径
+                            volume.push_back( numSum );   //体積(voxel総数)
+                            if(minimumRadius > r) minimumRadius = r;
+                        }else{
+                            //近似しないのは全て0,0,0,0で統一,Distance field処理後に一斉削除する
+                            x_center.push_back(0);
+                            y_center.push_back(0);
+                            z_center.push_back(0);
+                            radius.push_back(0);
+                            volume.push_back(numSum);
+                            totalPoreVolume += (unsigned long)numSum;//近似されない気孔の総体積を格納
                         }
-                    }
-                    
-                    float containRate;
-                    if( surface_x.size() != 0 ) containRate = ((float)innerVoxSum/surface_x.size());
-                    cout << "contain =" << containRate << endl;
-                    /**ここからFindSnowmanを入れる,引数にcontainRateの条件を入れて*
-                    int findIterationLimit(300);
-                    int findTimes(0);*/
-                    if(/*numSum > volume_threa && containRate > 0.45*/ (maxRadius - minRadius) / solvedRad < 0.25 ) //小さすぎる気孔と奇形の気孔は近似しない
-                    {
-                        /*if (containRate < 0.7) {
-                            while(true){
-                                findTimes++;
-                                if(FindSnowManPore() == true || findTimes >= findIterationLimit)break;
-                            }
-                            cout << "times = " << findTimes << endl;
-                            if(findTimes >= findIterationLimit) cout << "Not Found" << endl;
-                        }*/
-                        x_center.push_back( xx ); //重心
-                        y_center.push_back( yy );
-                        z_center.push_back( zz );
-                        radius.push_back( r );    //半径
-                        volume.push_back( numSum );   //体積(voxel総数)
-                        if(minimumRadius > r) minimumRadius = r;
-                    }else{
-                        //近似しないのは全て0,0,0,0で統一,Distance field処理後に一斉削除する
-                        x_center.push_back(0);
-                        y_center.push_back(0);
-                        z_center.push_back(0);
-                        radius.push_back(0);
-                        volume.push_back(numSum);
                     }
                     surface_x.clear(); surface_y.clear();surface_z.clear();
                     iSum = 0; jSum = 0; kSum = 0; numSum = 0;
@@ -235,6 +214,7 @@ void Voxel::Labeling()
     WriteCsvData("SphericityDeviation.csv");
     csvContainer.clear();
     cout << "minimumRadius = "<< minimumRadius <<endl;
+    cout << "total volume of unapproximated pores = " << totalPoreVolume << endl;
 }
 
 

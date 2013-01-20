@@ -34,6 +34,7 @@ public:
     void Labeling();    //ラベリング
     void ComputeDistanceField();    //距離場計算
 private:
+    unsigned long totalPoreVolume;
     std::vector<int> surface_x;  //Poreの表面部のボクセルを保存
     std::vector<int> surface_y;
     std::vector<int> surface_z;
@@ -100,4 +101,5 @@ private:
         return ( a < b ) ? ( a ) : ( b );
     }
     void InitVoxel();
+    void UpdateVoxel();
 };

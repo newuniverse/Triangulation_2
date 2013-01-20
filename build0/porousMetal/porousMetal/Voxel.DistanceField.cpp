@@ -16,19 +16,27 @@ void Voxel::ComputeDistanceField()
     //##########ここからループに
     
     bool continueToLoop( true );
-   
     int loopCount( 0 );
+    unsigned long SumOfSphereVolume( 0 );
+    
+    //voxelの初期化
+    if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName());
+    if(cv.GetDim() == 2) ReadFile(cv.GetFileName());
+    InitVoxel();
+    
     while (continueToLoop == true) {
         loopCount++;
         cout << "loop count = "<< loopCount <<endl;
         //step1####################################################
         cout << "step1: Propagation" << endl;
         //VDTで距離場計算
+        UpdateVoxel();
         Vdt();
-    
         //Distance fieldの結果を書き出し
+        ostringstream s ;
+        s << loopCount;
         if(cv.GetDim() == 3) WriteBinaryFile(voxel, "DistanceField");//3D
-        if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField"); //2D
+        if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField" + s.str()); //2D
     
         //step2 ####################################################
         cout << "step2: Find LocalMaximum" << endl;
@@ -42,26 +50,14 @@ void Voxel::ComputeDistanceField()
                     int xx = i; int yy = j; int zz = k; float r(0);
                     if( FindLocalMaximum( voxel, xx, yy, zz, r ) == true && labelLayer[ i ][ j ][ k ] > 2)
                     {
-                    
                         x_temp_center.push_back( xx );
                         y_temp_center.push_back( yy );
                         z_temp_center.push_back( zz );
                         rad_temp_center.push_back( r );
-                    
                     }
                 }
             }
         }
-    /*
-    cout << rad_temp_center.size()<<"pair" << endl;
-    
-    for (int i = 0; i < (int)x_temp_center.size(); i++)
-    {
-        int x = x_temp_center[ i ];
-        int y = y_temp_center[ i ];
-        int z = z_temp_center[ i ];
-        voxel[x][y][z] = -1.0;
-    }*/
         //step3 ####################################################
         //RemoveFromSearchTarget + register sphere
         //pairで整理
@@ -88,6 +84,8 @@ void Voxel::ComputeDistanceField()
         int it_counter(0);
         int head(0);
         bool trueSignEvenOnce( false );
+        std::vector< std::pair< float, int > > labeledSubGroup; //ラベルごとの再近似用円のサブグループ(radius, index)を格納
+
         //すべての気孔にたいするループ
         while (it != data.end())
         {
@@ -95,15 +93,18 @@ void Voxel::ComputeDistanceField()
             int _label = it->first;
         
             //####
-            std::vector< std::pair< float, int > > labeledSubGroup; //ラベルごとの再近似用円のサブグループ(radius, index)を格納
+            //std::vector< std::pair< float, int > > labeledSubGroup; //ラベルごとの再近似用円のサブグループ(radius, index)を格納
             labeledSubGroup.push_back( std::pair<float, int >( rad_temp_center[it->second], it->second ) );
             //####
         
             //ラベルにそったサブグループへの振り分け
-            while (it->first == _label)
+            while (it->first == _label && it != data.end() )
             {
-                ++it;
-                ++it_counter;
+                it++;
+                it_counter++;
+                cout << "rand size = " << rad_temp_center.size() << endl;
+                std::cerr << "rad =" << /*rad_temp_center[it->second] <<*/
+                ", index = " << it->second <<endl;
                 labeledSubGroup.push_back( std::pair<float, int>( rad_temp_center[it->second], it->second ) );
             }
             //半径でソート
@@ -123,9 +124,17 @@ void Voxel::ComputeDistanceField()
                 currentLocalMax[ 1 ] = y_temp_center[ subit->second ];
                 currentLocalMax[ 2 ] = z_temp_center[ subit->second ];
                 currentRadius = rad_temp_center[ subit->second ];
+                
+                if(cv.GetDim() == 2) SumOfSphereVolume += round(M_PI * currentRadius*currentRadius);
+                
+                if(cv.GetDim() == 3) SumOfSphereVolume += round( 4 * M_PI * currentRadius*currentRadius*currentRadius / 3);
+                
                 //Removeして球を登録
                 RemoveFromSearchTarget(currentLocalMax[0], currentLocalMax[1], currentLocalMax[2], currentRadius );
-                if(radius[ _label ] == 0 && currentRadius > minimumRadius * 30 )
+                
+                //cout<< "current volume = " <<round(SumOfSphereVolume * 1.2) << "total volume"<<(double)totalPoreVolume<<endl ;
+                cout << "current radius = " << currentRadius << endl;
+                if(radius[ _label ] == 0 && currentRadius > 1/*minimumRadius floor(SumOfSphereVolume) < (double)totalPoreVolume*/ )
                 {
                     //continueToLoop = true;
                     trueSignEvenOnce = true;
@@ -133,11 +142,17 @@ void Voxel::ComputeDistanceField()
                     y_center.push_back( currentLocalMax[ 1 ]);
                     z_center.push_back( currentLocalMax[ 2 ]);
                     radius.push_back( currentRadius );
-                }
+                }//else continueToLoop = false;
                 subit++;
             }
             labeledSubGroup.clear();
         }
+        data.clear();
+        x_temp_center.clear();
+        y_temp_center.clear();
+        z_temp_center.clear();
+        rad_temp_center.clear();
+        
         if( trueSignEvenOnce == true ) continueToLoop = true;
         else continueToLoop = false;
     }
@@ -299,6 +314,10 @@ void Voxel::Vdt()
 {
     ConstValue cv;
     int x(0), y(0), z(0);
+    /*
+    if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName());
+    if(cv.GetDim() == 2) ReadFile(cv.GetFileName());
+    InitVoxel();*/
     
     x = cv.GetX();
     y = cv.GetY();
@@ -325,10 +344,6 @@ void Voxel::Vdt()
         }
     }
     
-    if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName());
-    if(cv.GetDim() == 2) ReadFile(cv.GetFileName());
-    
-    InitVoxel();
     
     //VDT
     for(int i = 0; i < x; i++){
@@ -581,7 +596,8 @@ void Voxel::Propagation(float ***table, int x, int y, int z, int direction)
 }
 
 //距離場計算のためのvoxelの初期化
-void Voxel::InitVoxel(){
+void Voxel::InitVoxel()
+{
     ConstValue cv;
     int x(0),y(0),z(0);
     x = cv.GetX();
@@ -591,16 +607,36 @@ void Voxel::InitVoxel(){
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
-                switch((int)voxel[i][j][k])
-                {
+                    switch((int)voxel[i][j][k])
+                    {
                     case 0:
-                        voxel[i][j][k] = inf;
+                            /*if( radius[ labelLayer[ i ][ j ][ k ] ] <= 0 ) voxel[ i ][ j ][ k ] = inf;
+                            else voxel[ i ][ j ][ k ] = 0; */
+                            voxel[ i ][ j ][ k ] = inf;
                         break;
                     case 1:
-                        voxel[i][j][k] = 0;
+                        voxel[ i ][ j ][ k ] = 0;
                     default:
                         break;
                 }
+            }
+        }
+    }
+}
+
+//２回目以上の距離場計算のためのVoxelの初期化
+void Voxel::UpdateVoxel()
+{
+    ConstValue cv;
+    int x(0),y(0),z(0);
+    x = cv.GetX();
+    y = cv.GetY();
+    z = cv.GetZ();
+    
+    for(int i = 0; i < x; i++){
+        for (int j = 0; j < y; j++) {
+            for (int k = 0; k < z; k++) {
+                if( (int)voxel[ i ][ j ][ k ] != 0 ) voxel[i][j][k] = inf;
             }
         }
     }
