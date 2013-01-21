@@ -1,0 +1,7 @@
+ushort 256 256 256
+value 0 
+fill
+value 1
+block 3 3 3 253 253 253 
+value 0 
+sphere 128 128 128 50

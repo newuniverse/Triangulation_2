@@ -23,6 +23,7 @@ void Voxel::ComputeDistanceField()
     if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName());
     if(cv.GetDim() == 2) ReadFile(cv.GetFileName());
     InitVoxel();
+    if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField"); //2D
     
     while (continueToLoop == true) {
         loopCount++;
@@ -30,12 +31,12 @@ void Voxel::ComputeDistanceField()
         //step1####################################################
         cout << "step1: Propagation" << endl;
         //VDTで距離場計算
-        UpdateVoxel();
+        if(loopCount > 1) UpdateVoxel();
         Vdt();
         //Distance fieldの結果を書き出し
         ostringstream s ;
         s << loopCount;
-        if(cv.GetDim() == 3) WriteBinaryFile(voxel, "DistanceField");//3D
+        if(cv.GetDim() == 3 && loopCount <= 1) WriteBinaryFile(voxel, "DistanceField");//3D
         if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField" + s.str()); //2D
     
         //step2 ####################################################
@@ -48,7 +49,7 @@ void Voxel::ComputeDistanceField()
                 for (int k = 0; k < z; k++)
                 {
                     int xx = i; int yy = j; int zz = k; float r(0);
-                    if( FindLocalMaximum( voxel, xx, yy, zz, r ) == true && labelLayer[ i ][ j ][ k ] > 2)
+                    if( FindLocalMaximum( voxel, xx, yy, zz, r ) == true && labelLayer[ i ][ j ][ k ] > 2 )
                     {
                         x_temp_center.push_back( xx );
                         y_temp_center.push_back( yy );
@@ -102,9 +103,8 @@ void Voxel::ComputeDistanceField()
             {
                 it++;
                 it_counter++;
-                cout << "rand size = " << rad_temp_center.size() << endl;
-                std::cerr << "rad =" << /*rad_temp_center[it->second] <<*/
-                ", index = " << it->second <<endl;
+                //cout << "rand size = " << rad_temp_center.size() << endl;
+                //std::cerr << "rad =" << /*rad_temp_center[it->second] <<*/", index = " << it->second <<endl;
                 labeledSubGroup.push_back( std::pair<float, int>( rad_temp_center[it->second], it->second ) );
             }
             //半径でソート
@@ -134,7 +134,7 @@ void Voxel::ComputeDistanceField()
                 
                 //cout<< "current volume = " <<round(SumOfSphereVolume * 1.2) << "total volume"<<(double)totalPoreVolume<<endl ;
                 cout << "current radius = " << currentRadius << endl;
-                if(radius[ _label ] == 0 && currentRadius > 1/*minimumRadius floor(SumOfSphereVolume) < (double)totalPoreVolume*/ )
+                if(radius[ _label ] == 0 && currentRadius >= 2 && _label > 2/*minimumRadius floor(SumOfSphereVolume) < (double)totalPoreVolume*/ )  //収束条件
                 {
                     //continueToLoop = true;
                     trueSignEvenOnce = true;
@@ -152,11 +152,9 @@ void Voxel::ComputeDistanceField()
         y_temp_center.clear();
         z_temp_center.clear();
         rad_temp_center.clear();
-        
         if( trueSignEvenOnce == true ) continueToLoop = true;
         else continueToLoop = false;
     }
-    
     if(cv.GetDim() == 3) WriteBinaryFile(voxel, "Matching");
     if(cv.GetDim() == 2) WriteTextFile(voxel, "Matching");
     cout << "loop count = "<< loopCount <<endl;
@@ -607,17 +605,19 @@ void Voxel::InitVoxel()
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
-                    switch((int)voxel[i][j][k])
-                    {
-                    case 0:
-                            /*if( radius[ labelLayer[ i ][ j ][ k ] ] <= 0 ) voxel[ i ][ j ][ k ] = inf;
-                            else voxel[ i ][ j ][ k ] = 0; */
-                            voxel[ i ][ j ][ k ] = inf;
-                        break;
-                    case 1:
-                        voxel[ i ][ j ][ k ] = 0;
-                    default:
-                        break;
+                int _label = labelLayer[ i ][ j ][ k ];
+                switch((int)voxel[ i ][ j ][ k ])
+                {
+                case 0://気孔
+                        if( (int)radius[ _label ] > 0 || _label == 2) {
+                            voxel[ i ][ j ][ k ] = 0;
+                        }
+                        else voxel[ i ][ j ][ k ] = inf;
+                    break;
+                case 1://金属
+                    voxel[ i ][ j ][ k ] = 0;
+                default:
+                    break;
                 }
             }
         }
@@ -636,7 +636,7 @@ void Voxel::UpdateVoxel()
     for(int i = 0; i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
-                if( (int)voxel[ i ][ j ][ k ] != 0 ) voxel[i][j][k] = inf;
+                if( (int)voxel[ i ][ j ][ k ] != 0 ) voxel[ i ][ j ][ k ] = inf;
             }
         }
     }

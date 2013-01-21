@@ -156,8 +156,9 @@ void Rendering::DrawSphere(){   //まだ2D版
     
     if( cv.GetDim() == 3 )
     {
-        for (int i = 2; i < verN; i++)
+        for (int i = 1; i <= verN; i++)
         {
+            cout << "radius sum =" << radius[ i ] <<endl;
             glPushMatrix();
             glTranslatef(ver[ i ][ 0 ], ver[ i ][ 1 ], ver[ i ][ 2 ] );
             glutSolidSphere( radius[ i ] , 16, 16);

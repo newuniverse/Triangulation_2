@@ -213,7 +213,7 @@ void Voxel::WriteSphere()
         for (int i = 1; i < radius.size(); i++)//index = 0は周りの非材料部分, 1からがセル
         {
             if(radius[ i ] < 0) break;
-            if(radius[ i ] != 0 && x_center[i] != 0 )
+            if((int)radius[ i ] != 0 && (int)x_center[i] != 0 )
             {
                 if( cv.GetDim() == 2 )
                 {

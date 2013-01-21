@@ -90,12 +90,13 @@ void Voxel::Labeling()
         }
     }
     //labelの値合わせ
-    for (int i = 0; i < labelIndex; i++) {
+    for (int i = 0; i <= labelIndex; i++) {
         x_center.push_back(0);
         y_center.push_back(0);
         z_center.push_back(0);
         radius.push_back(0);
     }
+    cout << radius.size() << endl;
     //Labeling開始　labelの値は2からで、2は外側(空気部分)のすべてのvoxelに割り当てられる
     queue<int> xq,yq,zq;
     int iSum, jSum, kSum, numSum;  //重心、半径計算用
@@ -149,7 +150,9 @@ void Voxel::Labeling()
                         if( rad > maxRadius) maxRadius = rad;
                         if( rad < minRadius ) minRadius = rad;
                     }
-                    csvContainer.push_back( (maxRadius - minRadius) / solvedRad );
+                    float sphericityDeviation = 1.0 - ((maxRadius - minRadius) / maxRadius);
+                    if(labelIndex > 2) csvContainer.push_back( sphericityDeviation );
+                    cout << "maxrad = " << maxRadius << ", minrad = " << minRadius << ", solvedrad = "<< solvedRad<< " "<< sphericityDeviation <<endl;
                     //if( (maxRadius - minRadius) / solvedRad < 0.4 )
                     cout << "center =  "<< center[ 0 ] << " " << center[ 1 ] << " "<< center[ 2 ] << endl;
                     //最小二乗平均球の中心を描く
@@ -166,7 +169,7 @@ void Voxel::Labeling()
                     if(cv.GetDim() == 3)  r = pow( 3.0 * (float)numSum / (4.0*M_PI) , 1.0/3.0);
                     
                     if(labelIndex > 2){
-                        if( numSum > volume_threa &&  (maxRadius - minRadius) / solvedRad < 0.25 ) //小さすぎる気孔と奇形の気孔は近似しない
+                        if( /*numSum > volume_threa &&*/ sphericityDeviation < 0.2 )
                         {
                             x_center.push_back( xx ); //重心
                             y_center.push_back( yy );
@@ -176,12 +179,13 @@ void Voxel::Labeling()
                             if(minimumRadius > r) minimumRadius = r;
                         }else{
                             //近似しないのは全て0,0,0,0で統一,Distance field処理後に一斉削除する
-                            x_center.push_back(0);
-                            y_center.push_back(0);
-                            z_center.push_back(0);
-                            radius.push_back(0);
+                            x_center.push_back( 0 );
+                            y_center.push_back( 0 );
+                            z_center.push_back( 0 );
+                            radius.push_back( 0 );
                             volume.push_back(numSum);
                             totalPoreVolume += (unsigned long)numSum;//近似されない気孔の総体積を格納
+                            cout << "unapproximated sphe label = "<< labelIndex << endl;
                         }
                     }
                     surface_x.clear(); surface_y.clear();surface_z.clear();
@@ -215,6 +219,7 @@ void Voxel::Labeling()
     csvContainer.clear();
     cout << "minimumRadius = "<< minimumRadius <<endl;
     cout << "total volume of unapproximated pores = " << totalPoreVolume << endl;
+    cout << "candidate sphere sum = " << radius.size() - 2 <<endl;
 }
 
 
