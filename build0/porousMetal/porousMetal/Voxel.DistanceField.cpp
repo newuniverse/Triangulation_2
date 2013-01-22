@@ -136,7 +136,7 @@ void Voxel::ComputeDistanceField()
                 
                 //cout<< "current volume = " <<round(SumOfSphereVolume * 1.2) << "total volume"<<(double)totalPoreVolume<<endl ;
                 cout << "current radius = " << currentRadius << endl;
-                if(radius[ _label ] == 0 && currentRadius >= 1 && _label > 2/*minimumRadius floor(SumOfSphereVolume) < (double)totalPoreVolume*/ )  //収束条件
+                if( radius[ _label ] == 0 && currentRadius >= 2 && _label > 2/*minimumRadius floor(SumOfSphereVolume) < (double)totalPoreVolume*/ )  //収束条件
                 {
                     //continueToLoop = true;
                     trueSignEvenOnce = true;
@@ -215,7 +215,7 @@ bool Voxel::FindLocalMaximum(float ***table, int &x, int &y, int &z, float &dis)
         if( !this->isValid( x, y, z ) ) continue;
         if ( !this->isValid( qx, qy, qz ) ) continue;
         
-        if( table[ qx ][ qy ][ qz ] < table[ x ][ y ][ z ] && table[ x ][ y ][ z ] > 0.0)
+        if( table[ qx ][ qy ][ qz ] <= table[ x ][ y ][ z ] && table[ x ][ y ][ z ] > 0.0)
         {
             dis = table[ x ][ y ][ z ];
         }else flag = false;
