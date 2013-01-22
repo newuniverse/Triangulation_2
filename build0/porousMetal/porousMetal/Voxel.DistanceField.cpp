@@ -51,6 +51,7 @@ void Voxel::ComputeDistanceField()
                     int xx = i; int yy = j; int zz = k; float r(0);
                     if( FindLocalMaximum( voxel, xx, yy, zz, r ) == true && labelLayer[ i ][ j ][ k ] > 2 )
                     {
+                        RemoveFromSearchTarget( xx, yy, zz, r );
                         x_temp_center.push_back( xx );
                         y_temp_center.push_back( yy );
                         z_temp_center.push_back( zz );
@@ -95,17 +96,18 @@ void Voxel::ComputeDistanceField()
         
             //####
             //std::vector< std::pair< float, int > > labeledSubGroup; //ラベルごとの再近似用円のサブグループ(radius, index)を格納
-            labeledSubGroup.push_back( std::pair<float, int >( rad_temp_center[it->second], it->second ) );
+            //labeledSubGroup.push_back( std::pair<float, int >( rad_temp_center[it->second], it->second ) );
             //####
         
             //ラベルにそったサブグループへの振り分け
-            while (it->first == _label && it != data.end() )
+            while (it->first == _label || it != data.end() )
             {
+                labeledSubGroup.push_back( std::pair<float, int>( rad_temp_center[it->second], it->second ) );
                 it++;
                 it_counter++;
-                //cout << "rand size = " << rad_temp_center.size() << endl;
+                cout << "rand size = " << rad_temp_center.size() << endl;
                 //std::cerr << "rad =" << /*rad_temp_center[it->second] <<*/", index = " << it->second <<endl;
-                labeledSubGroup.push_back( std::pair<float, int>( rad_temp_center[it->second], it->second ) );
+                
             }
             //半径でソート
             std::sort( labeledSubGroup.rbegin(), labeledSubGroup.rend() );
@@ -130,11 +132,11 @@ void Voxel::ComputeDistanceField()
                 if(cv.GetDim() == 3) SumOfSphereVolume += round( 4 * M_PI * currentRadius*currentRadius*currentRadius / 3);
                 
                 //Removeして球を登録
-                RemoveFromSearchTarget(currentLocalMax[0], currentLocalMax[1], currentLocalMax[2], currentRadius );
+                //RemoveFromSearchTarget(currentLocalMax[0], currentLocalMax[1], currentLocalMax[2], currentRadius );
                 
                 //cout<< "current volume = " <<round(SumOfSphereVolume * 1.2) << "total volume"<<(double)totalPoreVolume<<endl ;
                 cout << "current radius = " << currentRadius << endl;
-                if(radius[ _label ] == 0 && currentRadius >= 2 && _label > 2/*minimumRadius floor(SumOfSphereVolume) < (double)totalPoreVolume*/ )  //収束条件
+                if(radius[ _label ] == 0 && currentRadius >= 1 && _label > 2/*minimumRadius floor(SumOfSphereVolume) < (double)totalPoreVolume*/ )  //収束条件
                 {
                     //continueToLoop = true;
                     trueSignEvenOnce = true;

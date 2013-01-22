@@ -4,39 +4,46 @@
 #include <time.h>
 
 //近傍のボクセルの探索, 1 voxelについての処理
-void Voxel::SearchNeighborVoxel( int*** visitTable, float*** voxel, int& iSum, int& jSum, int& kSum, int& numSum,int labelIndex, queue<int>& xq, queue<int>& yq, queue<int>& zq, std::vector<int>& surface_x, std::vector<int>& surface_y, std::vector<int>& surface_z){
+void Voxel::SearchNeighborVoxel( int*** visitTable, float*** voxel, int& iSum, int& jSum, int& kSum, int& numSum, const int labelIndex, queue<int>& xq, queue<int>& yq, queue<int>& zq, std::vector<int>& surface_x, std::vector<int>& surface_y, std::vector<int>& surface_z){
     
     bool isSurfaceVoxel(false);
     int qx(0),qy(0),qz(0);
-    int poreVoxelCounter(0);
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++)
+    {
         qx = xq.front();
         qy = yq.front();
         qz = zq.front();
+        //cout << "direction index = "<<i <<endl;
         switch (i) {    //各方向への探索
-            case right: qx++; break;
-            case down: qy++; break;
-            case left: qx--; break;
-            case up: qy--; break;
-            case rear: qz++; break;
-            case front: qz--; break;
+            case 0: qx++; break;
+            case 1: qy++; break;
+            case 2: qz++; break;
+            case 3: qx--; break;
+            case 4: qy--; break;
+            case 5: qz--; break;
             default: break;
         }
+        //cout <<"(x, y, z ) = "<< qx <<" " << qy << " " << qz <<endl;
         if(!this->isValid(qx, qy, qz)) continue;
-        if(visitTable[qx][qy][qz] == notVisited && i < 6)
+        if(!this->isValid( xq.front(), yq.front(), zq.front())) continue;
+        
+        if(visitTable[qx][qy][qz] == notVisited )
         {
             visitTable[qx][qy][qz] = hasVisited;
-            voxel[qx][qy][qz] = labelIndex;
-            //cout << "labelindex = " << labelIndex;
-            iSum += qx;
-            jSum += qy;
-            kSum += qz;
-            numSum++;
+            //cout << labelIndex << endl;
+            voxel[qx][qy][qz] = (float)labelIndex*1.0;
+            //cout << "vox = " << voxel[qx][qy][qz];
+            if(labelIndex > 2){
+                iSum += qx;
+                jSum += qy;
+                kSum += qz;
+                numSum++;
+            }
             xq.push(qx);
             yq.push(qy);
             zq.push(qz);
         }
-        if( visitTable[qx][qy][qz] == isMaterial ) isSurfaceVoxel = true;
+        if( visitTable[ qx ][ qy ][ qz ] == isMaterial ) isSurfaceVoxel = true;
     }
     
     //表面のvoxelを保存
@@ -51,7 +58,7 @@ void Voxel::SearchNeighborVoxel( int*** visitTable, float*** voxel, int& iSum, i
 
 void Voxel::Labeling()
 {
-    srand((unsigned int)time(NULL));
+    //srand((unsigned int)time(NULL));
     //visitTableの確保
     ConstValue cv;
     totalPoreVolume = 0;
@@ -59,7 +66,9 @@ void Voxel::Labeling()
     x = cv.GetX();
     y = cv.GetY();
     z = cv.GetZ();
+    cout << x << "" << y<< " " << z;
     int ***visitTable;
+    
     visitTable = new int**[x];
     for (int i = 0;  i < x; i++)
     {
@@ -71,10 +80,12 @@ void Voxel::Labeling()
             visitTable[i][j] = new int[z];
         }
     }
+    
     //visitTableにvoxelをコピー
     for (int i = 0; i < x; i++) {
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
+                //cout << "voxel = "<<(int)voxel[i][j][k] <<endl;
                 switch ((int)voxel[i][j][k]) {
                     case 0:
                         visitTable[i][j][k] = notVisited;
@@ -89,6 +100,7 @@ void Voxel::Labeling()
             }
         }
     }
+    
     //labelの値合わせ
     for (int i = 0; i <= labelIndex; i++) {
         x_center.push_back(0);
@@ -96,8 +108,9 @@ void Voxel::Labeling()
         z_center.push_back(0);
         radius.push_back(0);
     }
-    cout << radius.size() << endl;
+    //cout << radius.size() << endl;
     //Labeling開始　labelの値は2からで、2は外側(空気部分)のすべてのvoxelに割り当てられる
+    //labelIndex =3;
     queue<int> xq,yq,zq;
     int iSum, jSum, kSum, numSum;  //重心、半径計算用
     for(int i = 0; i < x; i++){
@@ -106,7 +119,8 @@ void Voxel::Labeling()
                 if(visitTable[i][j][k] == notVisited){
                     visitTable[i][j][k] = hasVisited;
                     //外の余白部分のvoxel値をinfにしないよう回避
-                    voxel[i][j][k] = labelIndex;
+                    voxel[i][j][k] = (float)labelIndex*1.0;
+                    cout << "vox1 = "<<voxel[i][j][k] << endl;
                     iSum += i;
                     jSum += j;
                     kSum += k;
@@ -114,14 +128,18 @@ void Voxel::Labeling()
                     xq.push(i); //queueに入れる
                     yq.push(j);
                     zq.push(k);
-                    max_X_coordinate = 0; max_Y_coordinate = 0;
-                    min_X_coordinate = 500; min_Y_coordinate = 500;
+                   
                     do{ // 1 labelについての処理
                         SearchNeighborVoxel(visitTable, voxel, iSum, jSum, kSum, numSum, labelIndex, xq, yq, zq, surface_x, surface_y,surface_z);
                         xq.pop();   //先頭を除く
                         yq.pop();
                         zq.pop();
+                        //cout <<"queuesize = " <<xq.size() << endl;
                     }while(!xq.empty()); //queueが空ならループを終える
+                    
+                    //cout << "number of voxel = " << numSum <<endl;
+                    
+                    //cout << "vox2 = "<<voxel[i][j][k] << endl;
                     
                     //最小二乗平均球面の計算　最小二乗中心法(LSC)
                     dvector temp;
@@ -150,14 +168,26 @@ void Voxel::Labeling()
                         if( rad > maxRadius) maxRadius = rad;
                         if( rad < minRadius ) minRadius = rad;
                     }
-                    float sphericityDeviation = 1.0 - ((maxRadius - minRadius) / maxRadius);
-                    if(labelIndex > 2) csvContainer.push_back( sphericityDeviation );
+                    
+                    float correctionValue(0);
+                    if(solvedRad < 5) correctionValue = 0.4;
+                    else if(solvedRad < 30) correctionValue = 0.2;
+                    else if(solvedRad < 45) correctionValue = 0.1;
+                    else if(solvedRad < cv.GetX())correctionValue = 0.02;
+                    
+                    float sphericityDeviation = 1.0 - ((maxRadius - minRadius) / maxRadius) + correctionValue;
+                    if(labelIndex > 2 && solvedRad < cv.GetX() && solvedRad > 1)
+                    {
+                        csvContainer.push_back( sphericityDeviation );
+                        csvContainer2.push_back( solvedRad );
+                    }
+                    
                     cout << "maxrad = " << maxRadius << ", minrad = " << minRadius << ", solvedrad = "<< solvedRad<< " "<< sphericityDeviation <<endl;
                     //if( (maxRadius - minRadius) / solvedRad < 0.4 )
                     cout << "center =  "<< center[ 0 ] << " " << center[ 1 ] << " "<< center[ 2 ] << endl;
                     //最小二乗平均球の中心を描く
                     //if(isValid((int)center[ 0 ], (int)center[ 1 ], (int)center[ 2 ])) voxel[ (int)center[ 0 ] ][ (int)center[ 1 ] ][ (int)center[ 2 ] ] = -10;
-                  
+                  cout << "vox3 = "<<voxel[i][j][k] << endl;
                     
                /////////////////////////////////////////////////////////////////
                     
@@ -169,7 +199,7 @@ void Voxel::Labeling()
                     if(cv.GetDim() == 3)  r = pow( 3.0 * (float)numSum / (4.0*M_PI) , 1.0/3.0);
                     
                     if(labelIndex > 2){
-                        if( /*numSum > volume_threa &&*/ sphericityDeviation < 0.2 )
+                        if( /*numSum > volume_threa &&*/ sphericityDeviation > 0.75 )
                         {
                             x_center.push_back( xx ); //重心
                             y_center.push_back( yy );
@@ -183,7 +213,7 @@ void Voxel::Labeling()
                             y_center.push_back( 0 );
                             z_center.push_back( 0 );
                             radius.push_back( 0 );
-                            volume.push_back(numSum);
+                            volume.push_back( numSum );
                             totalPoreVolume += (unsigned long)numSum;//近似されない気孔の総体積を格納
                             cout << "unapproximated sphe label = "<< labelIndex << endl;
                         }
@@ -192,6 +222,7 @@ void Voxel::Labeling()
                     iSum = 0; jSum = 0; kSum = 0; numSum = 0;
                     labelIndex++;
                     cout << "labelindex = "<< labelIndex<< endl;
+                    cout << "vox4 = "<<voxel[i][j][k] << endl;
                 }
             }
         }
@@ -208,15 +239,21 @@ void Voxel::Labeling()
             labelLayer[i][j] = new int[z];
         }
     }
-    for(int i = 0; i < x; i++)
-        for(int j = 0; j < y; j++)
-            for(int k = 0; k < z; k++)
+    
+    for(int i = 0; i < x; i++){
+        for(int j = 0; j < y; j++){
+            for(int k = 0; k < z; k++){
                 labelLayer[i][j][k] = voxel[i][j][k];
+                
+            }
+        }
+    }
     
     if(cv.GetDim() == 2) WriteTextFile(voxel, "labeled");
     if(cv.GetDim() == 3) WriteBinaryFile();
     WriteCsvData("SphericityDeviation.csv");
     csvContainer.clear();
+    csvContainer2.clear();
     cout << "minimumRadius = "<< minimumRadius <<endl;
     cout << "total volume of unapproximated pores = " << totalPoreVolume << endl;
     cout << "candidate sphere sum = " << radius.size() - 2 <<endl;
@@ -404,6 +441,7 @@ dvector Voxel::LeastSquareSphere()
             solveMatrix( A, b );
         } catch (...) {
             cout << "solve Matrix failed!" <<endl;
+            for (int i = 0; i < 4; i++) b[i] = 0;
         }
         returnVector = b;
     }

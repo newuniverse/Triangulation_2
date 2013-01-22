@@ -21,7 +21,7 @@ public:
     int inf = 10000;
     int dimension = 2;  //全体処理時の次元
     enum flag { cantVisit = -4, notVisited = -3, hasVisited = -2, isMaterial = -1}; //visitTableで使う
-    enum direction { right = 0, down, left, up, rear, front};   //近傍探索で使う
+    enum direction { right = 0, down = 1, left = 2, up = 3, rear = 4, front = 5};   //近傍探索で使う
     Voxel();    //コンストラクタでvoxelをインスタンス化
     void ReadFile(string filename);    //voxelファイル読み込み
     int ReadBinaryFile(string filename);    
@@ -31,6 +31,7 @@ public:
     void WriteSphere(); //重心、半径書き出し->CGALに渡す用
     void WriteCsvData( string filename );
     std::vector<float> csvContainer; //sphericity deviation
+    std::vector<float> csvContainer2;//solved radius
     void Labeling();    //ラベリング
     void ComputeDistanceField();    //距離場計算
 private:
@@ -51,7 +52,7 @@ private:
     bool isFirstLoop;//一回目のラベリング内ループは余白部分のピクセルに対するもの
     int volume_threa = 16;  //pore体積の閾値、これより低いものは無視し、球近似を行わない、書き出さない
     float minimumRadius = 500; //Distance Field計算する際に気孔の半径の閾値として、Labelingしたときに一番小さい半径を選択
-    void SearchNeighborVoxel( int*** visitTable, float*** voxel, int& iSum, int& jSum, int& kSum, int& numSum, int labelIndex, queue<int>& xq, queue<int>& yq, queue<int>& zq, std::vector<int>& surface_x, std::vector<int>& surface_y, std::vector<int>& surface_z);   //近傍探索
+    void SearchNeighborVoxel( int*** visitTable, float*** voxel, int& iSum, int& jSum, int& kSum, int& numSum, const int labelIndex, queue<int>& xq, queue<int>& yq, queue<int>& zq, std::vector<int>& surface_x, std::vector<int>& surface_y, std::vector<int>& surface_z);   //近傍探索
     void Propagation(float *** table, int x, int y, int z, int direction);  //CDT
     
     void VdtPropagation( dvector ***vec, float***voxel, int x, int y, int z, int direction );   //VDTのプロパゲーション

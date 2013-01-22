@@ -21,11 +21,76 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "porousMetal/Voxel.DistanceField.cpp"
-         timestampString = "380179769.323188"
+         timestampString = "380433583.183804"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "138"
-         endingLineNumber = "138"
+         startingLineNumber = "140"
+         endingLineNumber = "140"
+         landmarkName = "Voxel::ComputeDistanceField()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.Labeling.cpp"
+         timestampString = "380469221.307345"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "142"
+         endingLineNumber = "142"
+         landmarkName = "Voxel::Labeling()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.Labeling.cpp"
+         timestampString = "380468870.486607"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "103"
+         endingLineNumber = "103"
+         landmarkName = "Voxel::Labeling()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.Labeling.cpp"
+         timestampString = "380468870.486607"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "48"
+         endingLineNumber = "48"
+         landmarkName = "Voxel::SearchNeighborVoxel( int*** visitTable, float*** voxel, int&amp; iSum, int&amp; jSum, int&amp; kSum, int&amp; numSum, const int labelIndex, queue&lt;int&gt;&amp; xq, queue&lt;int&gt;&amp; yq, queue&lt;int&gt;&amp; zq, std::vector&lt;int&gt;&amp; surface_x, std::vector&lt;int&gt;&amp; surface_y, std::vector&lt;int&gt;&amp; surface_z)"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.Labeling.cpp"
+         timestampString = "380468870.486607"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "70"
+         endingLineNumber = "70"
+         landmarkName = "Voxel::Labeling()"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "porousMetal/Voxel.DistanceField.cpp"
+         timestampString = "380482666.672531"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "41"
+         endingLineNumber = "41"
          landmarkName = "Voxel::ComputeDistanceField()"
          landmarkType = "5">
       </FileBreakpoint>
@@ -34,11 +99,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "porousMetal/main.cpp"
-         timestampString = "380178916.683182"
+         timestampString = "380492146.198772"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "35"
-         endingLineNumber = "35"
+         startingLineNumber = "34"
+         endingLineNumber = "34"
          landmarkName = "main (int argc, char ** argv)"
          landmarkType = "7">
       </FileBreakpoint>

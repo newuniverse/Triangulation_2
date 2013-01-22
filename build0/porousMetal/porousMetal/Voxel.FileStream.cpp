@@ -35,17 +35,25 @@ int Voxel::ReadBinaryFile(string filename)
 		printf("%sファイルが開けません¥n",filename.c_str());
 		return -1;
 	}
-	//指定回数により，データを抽出
+  
+    int count = 0;
+    int zcount = 0;
+    
+    //指定回数により，データを抽出
 	for(int i=0;i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
-                int temp;
-                fread(&temp, sizeof(short), 1, in);
+                short temp;
+                fread(&temp, sizeof(short), 1, in) ;
                 voxel[i][j][k] = (float)(temp*1.0);
-                //cout << "voxel = "<< voxel[i][j][k] <<endl;
+                if( voxel[i][j][k] > 0 ) count++;
+                else zcount++;
+                // cout << "voxel = "<< temp <<endl;
             }
         }
     }
+    cerr<<zcount<<"voxels are zero."<<std::endl;
+    cerr<<count<<"voxels are non-zero."<<std::endl;
     cout << "read!"<<endl;
 	fclose(in);
     return 0;
@@ -137,8 +145,9 @@ void Voxel::WriteBinaryFile(){
     for(int i=0;i < x; i++){
         for (int j = 0; j < y; j++) {
             for (int k = 0; k < z; k++) {
-                float temp = voxel[i][j][k];
-                fwrite(&temp, sizeof(float), 1, out);
+                unsigned short temp = (int) voxel[i][j][k];
+                //cout << voxel[i][j][k] <<endl;
+                fwrite(&temp, sizeof(unsigned short), 1, out);
             }
         }
     }
@@ -165,7 +174,7 @@ void Voxel::WriteBinaryFile(float ***table, string filename){
 void Voxel::WriteCsvData(string filename)
 {
     ofstream fout;
-    fout.open(filename.c_str()); //CGALに渡すデータ
+    fout.open(filename.c_str()); 
     if(!fout.is_open())
     {
         cout << "ファイルをオープンできません" << endl;
@@ -173,10 +182,26 @@ void Voxel::WriteCsvData(string filename)
     else
     {
         for (int i = 0; i < (int)csvContainer.size(); i++)
-            fout << csvContainer[ i ] << "\n";
+            fout << csvContainer2[ i ] << ","<< csvContainer[ i ] <<"\n";
         fout.close();
         fout.clear();
     }
+    
+    ofstream fout2;
+    fout2.open("volumes.csv");
+    if(!fout2.is_open())
+    {
+        cout << "ファイルをオープンできません" << endl;
+    }
+    else
+    {
+        fout2 << labelIndex - 3 << "\n";
+        for (int i = 0; i < (int)volume.size(); i++)
+            fout2 << volume[ i ] <<"\n";
+        fout2.close();
+        fout2.clear();
+    }
+    
 }
 
 void Voxel::WriteSphere()
