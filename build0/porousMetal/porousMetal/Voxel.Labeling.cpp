@@ -30,9 +30,7 @@ void Voxel::SearchNeighborVoxel( int*** visitTable, float*** voxel, int& iSum, i
         if(visitTable[qx][qy][qz] == notVisited )
         {
             visitTable[qx][qy][qz] = hasVisited;
-            //cout << labelIndex << endl;
             voxel[qx][qy][qz] = (float)labelIndex*1.0;
-            //cout << "vox = " << voxel[qx][qy][qz];
             if(labelIndex > 2){
                 iSum += qx;
                 jSum += qy;
@@ -120,7 +118,6 @@ void Voxel::Labeling()
                     visitTable[i][j][k] = hasVisited;
                     //外の余白部分のvoxel値をinfにしないよう回避
                     voxel[i][j][k] = (float)labelIndex*1.0;
-                    cout << "vox1 = "<<voxel[i][j][k] << endl;
                     iSum += i;
                     jSum += j;
                     kSum += k;
@@ -182,12 +179,7 @@ void Voxel::Labeling()
                         csvContainer2.push_back( solvedRad );
                     }
                     
-                    cout << "maxrad = " << maxRadius << ", minrad = " << minRadius << ", solvedrad = "<< solvedRad<< " "<< sphericityDeviation <<endl;
-                    //if( (maxRadius - minRadius) / solvedRad < 0.4 )
-                    cout << "center =  "<< center[ 0 ] << " " << center[ 1 ] << " "<< center[ 2 ] << endl;
-                    //最小二乗平均球の中心を描く
-                    //if(isValid((int)center[ 0 ], (int)center[ 1 ], (int)center[ 2 ])) voxel[ (int)center[ 0 ] ][ (int)center[ 1 ] ][ (int)center[ 2 ] ] = -10;
-                  cout << "vox3 = "<<voxel[i][j][k] << endl;
+                  
                     
                /////////////////////////////////////////////////////////////////
                     
@@ -199,7 +191,7 @@ void Voxel::Labeling()
                     if(cv.GetDim() == 3)  r = pow( 3.0 * (float)numSum / (4.0*M_PI) , 1.0/3.0);
                     
                     if(labelIndex > 2){
-                        if( /*numSum > volume_threa &&*/ sphericityDeviation > 0.75 )
+                        if( /*numSum > volume_threa &&*/ sphericityDeviation > 0.7 )
                         {
                             x_center.push_back( xx ); //重心
                             y_center.push_back( yy );
@@ -215,14 +207,12 @@ void Voxel::Labeling()
                             radius.push_back( 0 );
                             volume.push_back( numSum );
                             totalPoreVolume += (unsigned long)numSum;//近似されない気孔の総体積を格納
-                            cout << "unapproximated sphe label = "<< labelIndex << endl;
                         }
                     }
                     surface_x.clear(); surface_y.clear();surface_z.clear();
                     iSum = 0; jSum = 0; kSum = 0; numSum = 0;
                     labelIndex++;
                     cout << "labelindex = "<< labelIndex<< endl;
-                    cout << "vox4 = "<<voxel[i][j][k] << endl;
                 }
             }
         }

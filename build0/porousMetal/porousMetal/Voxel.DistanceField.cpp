@@ -4,7 +4,8 @@
 void Voxel::ComputeDistanceField()
 {
     cout << "begin distance field!"<< endl;
-    
+    clock_t start,tempstart,end;
+    start = clock();
     ConstValue cv;
     int x(0), y(0), z(0);
     
@@ -22,8 +23,14 @@ void Voxel::ComputeDistanceField()
     //voxelの初期化
     if(cv.GetDim() == 3) ReadBinaryFile(cv.GetFileName());
     if(cv.GetDim() == 2) ReadFile(cv.GetFileName());
+    end = clock();
+    cout << "voxel読み込み時間=" << (end - start)/CLOCKS_PER_SEC<<"sec"<<endl;
+    
+    start = clock();
     InitVoxel();
-    if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField"); //2D
+    end = clock();
+    cout << "ボクセル初期化計算時間=" << (end - start)/CLOCKS_PER_SEC<<"sec"<<endl;
+    //if(cv.GetDim() == 2) WriteTextFile(voxel, "DistanceField"); //2D
     
     while (continueToLoop == true) {
         loopCount++;
@@ -31,8 +38,17 @@ void Voxel::ComputeDistanceField()
         //step1####################################################
         cout << "step1: Propagation" << endl;
         //VDTで距離場計算
+        
+        start = clock();
         if(loopCount > 1) UpdateVoxel();
+        end = clock();
+        cout << "ボクセル更新時間=" << (end - start)/CLOCKS_PER_SEC<<"sec"<<endl;
+        
+        start = clock();
         Vdt();
+        end = clock();
+        cout << "VDTs計算時間=" << (end - start)/CLOCKS_PER_SEC<<"sec"<<endl;
+        
         //Distance fieldの結果を書き出し
         ostringstream s ;
         s << loopCount;
@@ -41,6 +57,8 @@ void Voxel::ComputeDistanceField()
     
         //step2 ####################################################
         cout << "step2: Find LocalMaximum" << endl;
+        bool trueSignEvenOnce( false );
+        start = clock();
         //Raster scanでlocal maximumを探す
         for(int i = 0; i < x; i++)
         {
@@ -51,19 +69,33 @@ void Voxel::ComputeDistanceField()
                     int xx = i; int yy = j; int zz = k; float r(0);
                     if( FindLocalMaximum( voxel, xx, yy, zz, r ) == true && labelLayer[ i ][ j ][ k ] > 2 )
                     {
+                        tempstart = clock();
                         RemoveFromSearchTarget( xx, yy, zz, r );
-                        x_temp_center.push_back( xx );
-                        y_temp_center.push_back( yy );
-                        z_temp_center.push_back( zz );
-                        rad_temp_center.push_back( r );
+                        end = clock();
+                        cout << "Remove計算時間=" << (end - tempstart)/CLOCKS_PER_SEC<<"sec"<<endl;
+                        if( radius[ labelLayer[xx][yy][zz] ] == 0 && r >= 3 && labelLayer[ xx ][ yy ][ zz ] > 2){
+                            trueSignEvenOnce = true;
+                            x_center.push_back(xx);
+                            y_center.push_back(yy);
+                            z_center.push_back(zz);
+                            radius.push_back(r*1.05);
+                            
+                        }
+                        //x_temp_center.push_back( xx );
+                        //y_temp_center.push_back( yy );
+                        //z_temp_center.push_back( zz );
+                        //rad_temp_center.push_back( r );
                     }
                 }
             }
         }
+        end = clock();
+        cout << "局所最大計算時間=" << (end - start)/CLOCKS_PER_SEC<<"sec"<<endl;
         //step3 ####################################################
         //RemoveFromSearchTarget + register sphere
         //pairで整理
-        cout << "step3: RemoveTarget and Rigister" << endl;
+        cout << "step3:  Rigister" << endl;
+        /*
         std::vector< std::pair<int, int> > data; //(label, index)を格納
         for (int i = 0; i < (int)x_temp_center.size(); i++)
         {
@@ -73,12 +105,12 @@ void Voxel::ComputeDistanceField()
             data.push_back( std::pair<int, int>( labelLayer[ x ][ y ][ z ], i ) );
         }
         //ラベルごとにソート
-        std::sort( data.begin(), data.end() );
+        std::sort( data.begin(), data.end() );*/
     /*
     for (int i = 0; i < (int)data.size(); i++) {
         cout << data[i].first << " : " << data[i].second << endl;
     }*/
-    
+    /*
         //## labelに沿ったマッチング ##//
         std::vector<std::pair<int, int> >::iterator it; //(label, index)のイテレータ
         it = data.begin();
@@ -106,7 +138,6 @@ void Voxel::ComputeDistanceField()
                 it++;
                 it_counter++;
                 cout << "rand size = " << rad_temp_center.size() << endl;
-                //std::cerr << "rad =" << /*rad_temp_center[it->second] <<*/", index = " << it->second <<endl;
                 
             }
             //半径でソート
@@ -136,7 +167,7 @@ void Voxel::ComputeDistanceField()
                 
                 //cout<< "current volume = " <<round(SumOfSphereVolume * 1.2) << "total volume"<<(double)totalPoreVolume<<endl ;
                 cout << "current radius = " << currentRadius << endl;
-                if( radius[ _label ] == 0 && currentRadius >= 2 && _label > 2/*minimumRadius floor(SumOfSphereVolume) < (double)totalPoreVolume*/ )  //収束条件
+                if( radius[ _label ] == 0 && currentRadius >= 2 && _label > 2 )  //収束条件
                 {
                     //continueToLoop = true;
                     trueSignEvenOnce = true;
@@ -153,7 +184,7 @@ void Voxel::ComputeDistanceField()
         x_temp_center.clear();
         y_temp_center.clear();
         z_temp_center.clear();
-        rad_temp_center.clear();
+        rad_temp_center.clear();*/
         if( trueSignEvenOnce == true ) continueToLoop = true;
         else continueToLoop = false;
     }

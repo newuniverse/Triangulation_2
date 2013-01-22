@@ -3,10 +3,13 @@
 #include "ConstValue.h"
 #include "Rendering.h"
 #include "Mesh.h"
+#include <time.h>
 Calculate_Voronoi_vertex cvv;
 ////
 int main (int argc, char ** argv)
 {
+    clock_t start,end;
+    start = clock();
     ConstValue cv;
     cv.Set();
     Voxel vox;
@@ -29,6 +32,8 @@ int main (int argc, char ** argv)
             if(cv.GetDim() == 2) vox.ReadFile(cv.GetFileName());
             
             vox.Labeling(); //ラベリング
+            end = clock();
+            cout << "ラベリング計算時間=" << (end - start)/CLOCKS_PER_SEC<<"sec"<<endl;
             vox.ComputeDistanceField(); //距離場計算
             vox.WriteSphere();  //球近似ごの重心と半径の書き出し
             
@@ -66,5 +71,7 @@ int main (int argc, char ** argv)
         default:
             break;
     }
+    end = clock();
+    cout << "総計算時間=" << (end - start)/CLOCKS_PER_SEC<<"sec."<<endl;
     return 0;
 }
