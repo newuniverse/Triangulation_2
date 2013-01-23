@@ -36,6 +36,9 @@ public:
     void ComputeDistanceField();    //距離場計算
 private:
     unsigned long totalPoreVolume;
+    unsigned long spherePoreVolume;
+    unsigned long shapePoreVolume;
+    
     std::vector<int> surface_x;  //Poreの表面部のボクセルを保存
     std::vector<int> surface_y;
     std::vector<int> surface_z;

@@ -59,7 +59,10 @@ void Voxel::Labeling()
     //srand((unsigned int)time(NULL));
     //visitTableの確保
     ConstValue cv;
+    shapePoreVolume = 0;
+    spherePoreVolume = 0;
     totalPoreVolume = 0;
+    
     int x,y,z;
     x = cv.GetX();
     y = cv.GetY();
@@ -191,13 +194,14 @@ void Voxel::Labeling()
                     if(cv.GetDim() == 3)  r = pow( 3.0 * (float)numSum / (4.0*M_PI) , 1.0/3.0);
                     
                     if(labelIndex > 2){
-                        if( /*numSum > volume_threa &&*/ sphericityDeviation > 0.7 )
+                        if( sphericityDeviation >= 0.7 )
                         {
                             x_center.push_back( xx ); //重心
                             y_center.push_back( yy );
                             z_center.push_back( zz );
                             radius.push_back( r );    //半径
                             volume.push_back( numSum );   //体積(voxel総数)
+                            spherePoreVolume += numSum;
                             if(minimumRadius > r) minimumRadius = r;
                         }else{
                             //近似しないのは全て0,0,0,0で統一,Distance field処理後に一斉削除する
@@ -206,7 +210,7 @@ void Voxel::Labeling()
                             z_center.push_back( 0 );
                             radius.push_back( 0 );
                             volume.push_back( numSum );
-                            totalPoreVolume += (unsigned long)numSum;//近似されない気孔の総体積を格納
+                            shapePoreVolume += numSum;//近似されない気孔の総体積を格納
                         }
                     }
                     surface_x.clear(); surface_y.clear();surface_z.clear();
@@ -244,8 +248,9 @@ void Voxel::Labeling()
     WriteCsvData("SphericityDeviation.csv");
     csvContainer.clear();
     csvContainer2.clear();
+    totalPoreVolume = spherePoreVolume + shapePoreVolume;
     cout << "minimumRadius = "<< minimumRadius <<endl;
-    cout << "total volume of unapproximated pores = " << totalPoreVolume << endl;
+    cout << "total volume of unapproximated pores = " << shapePoreVolume << endl;
     cout << "candidate sphere sum = " << radius.size() - 2 <<endl;
 }
 

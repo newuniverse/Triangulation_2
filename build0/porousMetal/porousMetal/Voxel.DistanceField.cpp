@@ -42,7 +42,7 @@ void Voxel::ComputeDistanceField()
         start = clock();
         if(loopCount > 1) UpdateVoxel();
         end = clock();
-        cout << "ボクセル更新時間=" << (end - start)/CLOCKS_PER_SEC<<"sec"<<endl;
+        //cout << "ボクセル更新時間=" << (end - start)/CLOCKS_PER_SEC<<"sec"<<endl;
         
         start = clock();
         Vdt();
@@ -70,10 +70,11 @@ void Voxel::ComputeDistanceField()
                     if( FindLocalMaximum( voxel, xx, yy, zz, r ) == true && labelLayer[ i ][ j ][ k ] > 2 )
                     {
                         tempstart = clock();
-                        RemoveFromSearchTarget( xx, yy, zz, r );
+                        
                         end = clock();
-                        cout << "Remove計算時間=" << (end - tempstart)/CLOCKS_PER_SEC<<"sec"<<endl;
-                        if( radius[ labelLayer[xx][yy][zz] ] == 0 && r >= 3 && labelLayer[ xx ][ yy ][ zz ] > 2){
+                        //cout << "Remove計算時間=" << (end - tempstart)/CLOCKS_PER_SEC<<"sec"<<endl;
+                        if( radius[ labelLayer[xx][yy][zz] ] == 0 && r >= 5 && labelLayer[ xx ][ yy ][ zz ] > 2){
+                            RemoveFromSearchTarget( xx, yy, zz, r );
                             trueSignEvenOnce = true;
                             x_center.push_back(xx);
                             y_center.push_back(yy);
@@ -95,6 +96,7 @@ void Voxel::ComputeDistanceField()
         //RemoveFromSearchTarget + register sphere
         //pairで整理
         cout << "step3:  Rigister" << endl;
+
         /*
         std::vector< std::pair<int, int> > data; //(label, index)を格納
         for (int i = 0; i < (int)x_temp_center.size(); i++)
@@ -165,7 +167,7 @@ void Voxel::ComputeDistanceField()
                 //Removeして球を登録
                 //RemoveFromSearchTarget(currentLocalMax[0], currentLocalMax[1], currentLocalMax[2], currentRadius );
                 
-                //cout<< "current volume = " <<round(SumOfSphereVolume * 1.2) << "total volume"<<(double)totalPoreVolume<<endl ;
+                //cout<< "current volume = " <<round(SumOfSphereVolume * 1.2) << "total volume"<<(double)shapePoreVolume<<endl ;
                 cout << "current radius = " << currentRadius << endl;
                 if( radius[ _label ] == 0 && currentRadius >= 2 && _label > 2 )  //収束条件
                 {
@@ -188,6 +190,15 @@ void Voxel::ComputeDistanceField()
         if( trueSignEvenOnce == true ) continueToLoop = true;
         else continueToLoop = false;
     }
+    //埋めていないボクセル(体積)をカウントして体積近似評価を行う
+    unsigned long remainedVolume(0);
+    for(int i = 0; i < x; i++)
+        for (int j = 0; j < y; j++)
+            for (int k = 0; k < z; k++)
+                if(voxel[ i ][ j ][ k ] > 0) remainedVolume++;
+
+    cout <<  "rateToShaped =" <<1.0 - (1.0 * remainedVolume) / ( 1.0 * shapePoreVolume ) << "\n"<< "rateToTotal = "<< 1.0 - (1.0 * remainedVolume) / ( 1.0 * totalPoreVolume ) << "\n" << "approximated sphere sum = " << radius.size() - 4 <<endl;
+    
     if(cv.GetDim() == 3) WriteBinaryFile(voxel, "Matching");
     if(cv.GetDim() == 2) WriteTextFile(voxel, "Matching");
     cout << "loop count = "<< loopCount <<endl;

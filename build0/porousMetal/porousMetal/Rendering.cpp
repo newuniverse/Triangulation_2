@@ -236,7 +236,7 @@ void Rendering::DrawSphere(){   //まだ2D版
 void Rendering::DrawTri() 
 {
     glLineWidth(1);
-    glColor3f(0, 1.0, 0.0);
+    glColor3f(0, 0.0, 0.0);
     for(int i = 0; i < triN ; i++){
         int *t = tri[i];
         glBegin(GL_TRIANGLES);
@@ -247,6 +247,7 @@ void Rendering::DrawTri()
         }
         glEnd();
     }
+    /*
     //debug用
     //今の三角形のvoronoi vertexを描く
     glPointSize(5);
@@ -558,7 +559,7 @@ void Rendering::Init()
     glEnable(GL_LIGHT0);   /* enable light 0 */
     glEnable(GL_DEPTH_TEST); /* enable z buffer */
     glDepthFunc(GL_LEQUAL);
-    glClearColor (0.0, 0.0, 0.0, 0.0);
+    glClearColor (1.0, 1.0, 1.0, 0.0);
 }
 
 //描画function
