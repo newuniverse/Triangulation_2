@@ -110,10 +110,10 @@
 		39B9E8C41600710A00A3606A /* porousMetal */ = {
 			isa = PBXGroup;
 			children = (
+				5CE660B816B0594200AC8EF3 /* Meshing3D.cpp */,
 				39C0FA9916636B8F003394F6 /* Meshing.cpp */,
 				394D9B3F165391CE004FA333 /* Rendering.h */,
 				39B9E8C51600710A00A3606A /* main.cpp */,
-				5CE660B816B0594200AC8EF3 /* Meshing3D.cpp */,
 				394D9B3E165391CE004FA333 /* Rendering.cpp */,
 				398E0B31165B57E100E07213 /* Voxel.DistanceField.cpp */,
 				39CBED25165136F5003EA345 /* Voxel.Labeling.cpp */,

@@ -34,6 +34,13 @@ public:
     static float **cross4Points_coor; //交点座標格納
     static int ***cross4Points_index; //球との交点のインデックスを i番目の三角形とj番目の球の4つの交点として入れる (n×3×4点) e.g. [i][2][0]には頂点2の向かいのvoro_verと辺の交点、[i][2][1]には頂点2の球の交点でさっきの辺との交点、[i][2][2]にはvoro_verと球心への辺の交点、[i][2][3]には...
     
+    
+    //３次元メッシュで計算され増加する点
+    static std::vector< std::vector<float> > newVerCoord;
+    static int ***verOnSphereIndex;
+    static int ***verOnTetraSurfaceIndex;
+    static int ***verOnTetraEdgeIndex;
+    
     //球の座標及び半径の読み込み
     static void ReadCoordinate(string filename);
     static void ReadCoordinate3D(string filename);
