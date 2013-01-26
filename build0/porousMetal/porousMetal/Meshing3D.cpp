@@ -51,8 +51,7 @@ void Rendering::Generate_3DMesh(float *ver0, float *ver1, float *ver2, float *ve
         temp = CalcVoroWithSurface( voro, ver[ 1 ], ver[ 2 ], ver[ 3 ]);
     }
         
-    
-    
+
 
 }
 
