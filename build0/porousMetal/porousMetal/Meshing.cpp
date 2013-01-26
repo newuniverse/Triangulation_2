@@ -424,6 +424,7 @@ void Rendering::InitMeshing()
     cross4Points_index = new int**[triN]; //交点のインデックス
     tri_attribute = new bool*[triN];
     angle_attribute = new int[ triN ];
+    
     for (int i = 0; i < triN; i++) {
         cross4Points_index[i] = new int*[3];
         tri_attribute[i] = new bool[ 4 ];    //[0]頂点1  [1] [2] [3]0 or 1 or 2(normal, overlap, separate);

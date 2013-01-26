@@ -9,6 +9,14 @@
 #include "API.h"
 #include <OpenGL/OpenGL.h>
 #include <GLUT/GLUT.h>
+#include <boost/numeric/ublas/matrix.hpp>   // 普通の行列用のヘッダ
+#include <boost/numeric/ublas/triangular.hpp> // 三角行列用のヘッダ．前進消去，後退代入に必要
+#include <boost/numeric/ublas/lu.hpp>       // LU分解，前進消去，後退代入用のヘッダ
+#include <boost/numeric/ublas/io.hpp>       // ストリーム入出力用ヘッダ
+using namespace boost::numeric::ublas;  // boost::numeric::ublas 名前空間を使用
+
+typedef boost::numeric::ublas::vector<double> dvector;
+typedef boost::numeric::ublas::matrix<double> dmatrix;
 
 class Rendering{
 public:
@@ -36,9 +44,10 @@ public:
     
     
     //３次元メッシュで計算され増加する点
-    static std::vector< std::vector<float> > newVerCoord;
+    //static std::vector< std::vector<float> > newVerCoord;
+    static float **newVerCoord;
     static int ***verOnSphereIndex;
-    static int ***verOnTetraSurfaceIndex;
+    static int **verOnTetraSurfaceIndex;
     static int ***verOnTetraEdgeIndex;
     
     //球の座標及び半径の読み込み
@@ -97,6 +106,18 @@ private:
     
     static void Generate_3DMesh(float* ver0, float* ver1, float* ver2,float* ver3,float* voro_ver, int tetra_index, int pattern, bool isVoroVerOutside );
     
+    
+    static dvector CalcVoroWithSurface( dvector voro, dvector ver0, dvector ver1, dvector ver2 );
+    static dvector CalcVoroWithEdge( dvector voro, dvector s_v, dvector l_s_v );
+    static dvector CalcOverlapCross( dvector voro,  dvector ve, dvector vref, float rad );
+    static dvector CalcIntersectionWithSphere(dvector v_from, dvector v_to, float rad );
+    
+    static void solveMatrix(dmatrix A, dvector& b)
+    {
+        permutation_matrix<> pm(A.size1());
+        lu_factorize(A,pm);
+        lu_substitute(A,pm,b);
+    }
     
     static std::vector <float> CalcuCrossPointVoroWithEdge( dvector s_v, dvector l_s_v, dvector voro ); //voronoi vertexと三角形の辺との交点を求める関数、 頂点をstdのvectorとして返す
     static std::vector <float> CalcuCrossIntersectionWithSphere(dvector v_from, dvector v_to, float rad );

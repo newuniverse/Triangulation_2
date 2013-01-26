@@ -1,8 +1,12 @@
 #include "Rendering.h"
+float ** Rendering::newVerCoord;
+int *** Rendering::verOnSphereIndex;
+int ** Rendering::verOnTetraSurfaceIndex;
+int *** Rendering::verOnTetraEdgeIndex;
 
 void Rendering::Meshing3D(){
     
-    InitMeshing();
+    Init3DMeshing();
     
     for ( int i = 0; i < triN; i++ )
     {
@@ -39,8 +43,149 @@ void Rendering::Generate_3DMesh(float *ver0, float *ver1, float *ver2, float *ve
         ver[ 3 ][ i ] = ver3[ i ];
         voro[ i ] = voro_ver[ i ];
     }
-
     
+    //一番目の頂点に対して
+    if( verOnTetraSurfaceIndex[ tetra_index ][ 0 ] == -1 )
+    {
+        dvector temp(3);
+        temp = CalcVoroWithSurface( voro, ver[ 1 ], ver[ 2 ], ver[ 3 ]);
+    }
+        
+    
+    
+
+}
+
+dvector Rendering:: CalcVoroWithSurface(dvector voro, dvector v1, dvector v2, dvector v3 )
+{
+    dvector temp(2);
+    dvector b(2);
+    dmatrix A(2, 2);    //行列Aの計算
+    for(int i = 0; i <3 ;i++)
+    {
+        A(0,0) += ( v1[ i ] - v3[ i ] ) * ( v2[ i ] - v1 [ i ]);
+        A(0,1) += (v2[ i ] - v3[ i ]) * ( v2[ i ] - v1[ i ] );
+        A(1,0) += (v1[ i ] - v3[ i ]) * ( v3[ i ] - v1[ i ] );
+        A(1,1) += ( v2[ i ] - v3[ i ] ) * ( v3[ i ] - v1[ i ] );
+        b[0] += ( voro[ i ] - v3[ i ] )*( v2[ i ] - v1[ i ] );
+        b[1] += ( voro[ i ] - v3[ i ] )*( v3[ i ] - v1[ i ] );
+    }
+   
+    //行列計算の例外処理
+    try {
+        solveMatrix(A, b);
+    } catch (...) {
+        cout << "solve Matrix failed!" <<endl;
+        //return false;
+    }
+    temp = b[ 0 ]*v1 + b[ 1 ]*v2 + (1- b[0]- b[1])*v3;
+    return temp;
+}
+
+dvector Rendering:: CalcVoroWithEdge(dvector voro, dvector s_v, dvector l_s_v)
+{
+    float s_coeff;
+    dvector delta(3), delta_v(3);
+    dvector temp(3);
+    delta = l_s_v - s_v;
+    delta_v = l_s_v - voro;
+    s_coeff = (delta[0]*delta_v[0] + delta[1]*delta_v[1] + delta[2]*delta_v[2])/(pow(delta[0], 2) + pow(delta[1], 2) + pow(delta[2], 2));
+    
+    for (int i = 0; i < 3; i++)
+    {
+        temp[ i ] = s_coeff * s_v[ i ] + ( 1 - s_coeff ) * l_s_v[ i ];
+        //cout <<  temp[i] << ", ";
+    }
+    //cout << "\n";
+    return temp;
+}
+
+
+dvector Rendering:: CalcOverlapCross(dvector voro, dvector ve, dvector vref, float rad)
+{
+    dvector result( 3 );
+    float coeff( 0 );
+    float norm( 0 );
+    for ( int i = 0; i < 3; i++ )
+    {
+        norm += pow( voro[ i ] - ve[ i ], 2 );
+        coeff += pow( vref[ i ] - ve[ i ], 2 );
+    }
+    coeff = sqrt( pow( rad, 2 ) - coeff );
+    
+    norm = sqrt( norm );
+    
+    for ( int i = 0; i < 3; i++ )
+    {
+        result[i] = ve[i] + coeff * ( voro[ i ] - ve[i] ) / norm;
+    }
+    return result;
+}
+
+dvector Rendering:: CalcIntersectionWithSphere(dvector v_from, dvector v_to, float rad )
+{
+    dvector temp(3);
+    float norm(0);
+    for ( int i = 0; i < 3; i++ )
+    {
+        norm += pow( v_to[ i ] - v_from[ i ], 2 );
+    }
+    
+    norm = sqrt(norm);
+    
+    for (int i = 0; i < 3; i++)
+    {
+        temp[ i ] = v_from[ i ] + rad * ( v_to[i] - v_from[i] )/norm;
+        //cout << "temp = " << temp[i] << ", ";
+    }
+    //cout << "\n";
+    return temp;
+}
+
+
+
+
+void Rendering::Init3DMeshing()
+{
+    newVerCoord = new float*[ 42*triN ];
+    for( int i = 0; i < 42*triN; i++ )  newVerCoord[ i ] = new float[ 3 ];
+    
+    verOnSphereIndex = new int**[ triN ];
+    verOnTetraSurfaceIndex = new int*[ triN ];
+    verOnTetraEdgeIndex = new int**[ triN ];
+    
+    tri_attribute = new bool*[triN];
+    angle_attribute = new int[ triN ];
+    
+    for (int i = 0; i < triN; i++) {
+        verOnSphereIndex[ i ] = new int*[ 4 ];  //四頂点に7つずつ
+        verOnTetraEdgeIndex[ i ] = new int*[ 4 ]; //四頂点に3つずつ
+        
+        verOnTetraSurfaceIndex[ i ] = new int[ 4 ]; //四頂点に1つずつ
+        tri_attribute[i] = new bool[ 4 ];    //[0]頂点1  [1] [2] [3]0 or 1 or 2(normal, overlap, separate);
+    }
+    for (int i = 0; i < triN; i++)
+    {
+        for (int j = 0; j < 3; j++) {
+            verOnSphereIndex[i][j] = new int[ 7 ];
+            verOnTetraEdgeIndex[ i ][ j ] = new int[ 3 ];
+        }
+    }
+    
+    for (int i = 0; i < triN; i++)
+    {
+        angle_attribute[i] = -1;    //鈍角を持たない場合は-1を返す
+        for (int j = 0; j < 4; j++)
+        {
+            verOnTetraSurfaceIndex[i][j] = -1;
+            tri_attribute[i][j] = false;
+            for (int k = 0; k < 7; k++)
+            {
+                verOnSphereIndex[i][j][k] = -1;
+                if( k < 3 )verOnTetraEdgeIndex[ i ][ j ][ k ] = -1;
+            }
+        }
+    }
     
 }
 
