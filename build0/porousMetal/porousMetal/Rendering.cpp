@@ -84,6 +84,11 @@ void Rendering::DrawMesh(){
     glDisable(GL_LIGHTING);
     glLineWidth(2);
     glColor3f(0, 0, 1);
+    
+    ofstream fout;
+    fout.open("mesh_real2D.txt");
+    
+    
     for (int i = 0; i < triN; i++) {    //各三角形についてのループ
         if(cross4Points_index[ i ][ 0 ][ 0 ] >= 0){
             cout << "drawing mesh" <<endl;
@@ -97,16 +102,33 @@ void Rendering::DrawMesh(){
                                 glBegin(GL_POLYGON);
                             
                                 glVertex3fv(voro_ver[i]);   //voronoi点
+                            fout << voro_ver[i][0] << " " << voro_ver[i][1]<< " ";
                                 int _index = cross4Points_index[ i ][ j ][ 0 ];
                                 glVertex3f( cross4Points_coor[ _index ][ 0 ], cross4Points_coor[ _index ][ 1 ], cross4Points_coor[ _index ][ 2 ] );  //voro とedgeの交点
-                                                        
+                                     fout <<cross4Points_coor[ _index ][ 0 ] << " " << cross4Points_coor[ _index ][ 1 ]<< " ";
+                            
+                           
                                 _index = cross4Points_index[ i ][ k ][ j + 1 ];
                                 glVertex3f( cross4Points_coor[ _index ][ 0 ], cross4Points_coor[ _index ][ 1 ], cross4Points_coor[ _index ][ 2 ] );  //球とedgeの交点
+                             float x,y,z;
+                            x = cross4Points_coor[ _index ][ 0 ]; y = cross4Points_coor[ _index ][ 1 ]; z = cross4Points_coor[ _index ][ 2 ];
                             
-                                _index = cross4Points_index[ i ][ k ][ k + 1];
+                            fout << cross4Points_coor[ _index ][ 0 ] << " " << cross4Points_coor[ _index ][ 1 ] << " ";
+                            
+                            _index = cross4Points_index[ i ][ k ][ k + 1];
                                 glVertex3f( cross4Points_coor[ _index ][ 0 ], cross4Points_coor[ _index ][ 1 ], cross4Points_coor[ _index ][ 2 ] );  //球とvoro沿線交点
-                            
+                            fout << cross4Points_coor[ _index ][ 0 ] << " " << cross4Points_coor[ _index ][ 1 ] << "\n";
                                 glEnd();
+                            
+                            
+                            /*
+                            glColor3f( 1, 0, 0 );
+                            glPointSize(7);
+                            glBegin(GL_POINTS);
+                            glVertex3f(cross4Points_coor[ _index ][ 0 ], cross4Points_coor[ _index ][ 1 ], cross4Points_coor[ _index ][ 2 ] );
+                            glColor3f(0, 1, 0);
+                            glVertex3f(x, y, z );
+                            glEnd();*/
                            // }
                         }
                     }
@@ -131,17 +153,27 @@ void Rendering::DrawMesh(){
                     glColor3f(1, 0, 1);
                     glBegin(GL_POLYGON);
                     glVertex3fv(voro_ver[i]);   //voronoi点
+                    fout << voro_ver[i][0] << " " << voro_ver[i][1]<<" ";
                     glVertex3f( cross4Points_coor[ index[0] ][ 0 ], cross4Points_coor[ index[0] ][ 1 ], cross4Points_coor[ index[0] ][ 2 ] );
-                    cout << cross4Points_coor[ index[0] ][ 0 ] <<endl;
+                    //cout << cross4Points_coor[ index[0] ][ 0 ] <<endl;
+                    
+                    fout <<cross4Points_coor[ index[0] ][ 0 ] << " " << cross4Points_coor[ index[0] ][ 1 ] << " ";
                     
                     glVertex3f(cross4Points_coor[ overlapPointIndex ][ 0 ], cross4Points_coor[ overlapPointIndex ][ 1 ], cross4Points_coor[ overlapPointIndex ][ 2 ]);
                     
+                    fout <<cross4Points_coor[ overlapPointIndex ][ 0 ] << " " << cross4Points_coor[ overlapPointIndex ][ 1 ] << " ";
+                    
                     glVertex3f( cross4Points_coor[ index[1] ][ 0 ], cross4Points_coor[ index[1] ][ 1 ], cross4Points_coor[ index[ 1 ] ][ 2 ] );
+                    
+                    fout <<cross4Points_coor[ index[1] ][ 0 ] << " " << cross4Points_coor[ index[1] ][ 1 ] << "\n";
+                    
                     glEnd();
                 }
             }
         }
     }
+    fout.close();
+    fout.clear();
 }
 
 //球の描画
@@ -163,42 +195,6 @@ void Rendering::DrawSphere(){   //まだ2D版
             glTranslatef(ver[ i ][ 0 ], ver[ i ][ 1 ], ver[ i ][ 2 ] );
             glutSolidSphere( radius[ i ] , 16, 16);
             glPopMatrix();
-            /*
-            for (float th = 0.0; th <= 360.0; th = th + 5.0)
-            {
-                for (float phi = 0.0; phi <= 180.0; phi = phi + 5.0) {
-                    float th2 = th + 15.0;
-                    float th_rad = th / 180.0 * M_PI;
-                    float th2_rad = th2 / 180.0 * M_PI;
-                
-                    float phi2 = phi + 15.0;
-                    float phi_rad = phi / 180.0 * M_PI;
-                    float phi2_rad = phi2 / 180.0 * M_PI;
-                
-                    float x1 = radius[ i ] * cos( th_rad ) * sin( phi_rad );
-                    float x2 = radius[ i ] * cos( th2_rad ) * sin( phi_rad );
-                    float x3 = radius[ i ] * cos( th2_rad ) * sin( phi2_rad );
-                    float x4 = radius[ i ] * cos( th_rad ) * sin( phi2_rad );
-                
-                    float y1 = radius[ i ] * sin( th_rad ) * sin( phi_rad );
-                    float y2 = radius[ i ] * sin( th2_rad ) * sin( phi_rad );
-                    float y3 = radius[ i ] * sin( th2_rad ) * sin( phi2_rad );
-                    float y4 = radius[ i ] * sin( th_rad ) * sin( phi2_rad );
-                
-                    float z1 = radius[ i ] *  cos( phi_rad );
-                    float z2 = radius[ i ] *  cos( phi_rad );
-                    float z3 = radius[ i ] *  cos( phi2_rad );
-                    float z4 = radius[ i ] *  cos( phi2_rad );
-                
-                    glBegin(GL_POLYGON);
-                    glVertex3f( ver[ i ][ 0 ], ver[ i ][ 1 ], ver[ i ][ 2 ] );
-                    glVertex3f( ver[ i ][ 0 ] + x1, ver[ i ][ 1 ] + y1, ver[ i ][ 2 ] + z1 );
-                    glVertex3f( ver[ i ][ 0 ] + x2, ver[ i ][ 1 ] + y2, ver[ i ][ 2 ] + z2 );
-                    glVertex3f( ver[ i ][ 0 ] + x3, ver[ i ][ 1 ] + y3, ver[ i ][ 2 ] + z3 );
-                    glVertex3f( ver[ i ][ 0 ] + x4, ver[ i ][ 1 ] + y4, ver[ i ][ 2 ] + z4 );
-                    glEnd();
-                }
-            }*/
         }
     }
     if( cv.GetDim() == 2 ){
@@ -235,17 +231,51 @@ void Rendering::DrawSphere(){   //まだ2D版
 //Delaunay三角形の描画
 void Rendering::DrawTri() 
 {
-    glLineWidth(1);
+    glLineWidth(2);
     glColor3f(0, 0.0, 0.0);
     for(int i = 0; i < triN ; i++){
         int *t = tri[i];
-        glBegin(GL_TRIANGLES);
-        if(t[0] != 0 && t[1] != 0 && t[2] != 0){
+        
+        if(cv.GetDim() == 2)
+        {
+            if(t[0] != 0 && t[1] != 0 && t[2] != 0){
+            glBegin(GL_TRIANGLES);
             glVertex3fv(ver[t[0]]);
             glVertex3fv(ver[t[1]]);
             glVertex3fv(ver[t[2]]);
+            glEnd();
+            }
         }
-        glEnd();
+        if(cv.GetDim() == 3)
+        {
+            if(t[0] != 0 && t[1] != 0 && t[2] != 0 && t[ 3 ] != 0)
+            {
+                glBegin(GL_LINES);
+                glVertex3fv(ver[t[0]]);
+                glVertex3fv(ver[t[1]]);
+                glEnd();
+                glBegin(GL_LINES);
+                glVertex3fv(ver[t[0]]);
+                glVertex3fv(ver[t[2]]);
+                glEnd();
+                glBegin(GL_LINES);
+                glVertex3fv(ver[t[0]]);
+                glVertex3fv(ver[t[3]]);
+                glEnd();
+                glBegin(GL_LINES);
+                glVertex3fv(ver[t[1]]);
+                glVertex3fv(ver[t[2]]);
+                glEnd();
+                glBegin(GL_LINES);
+                glVertex3fv(ver[t[2]]);
+                glVertex3fv(ver[t[3]]);
+                glEnd();
+                glBegin(GL_LINES);
+                glVertex3fv(ver[t[3]]);
+                glVertex3fv(ver[t[1]]);
+                glEnd();
+            }
+        }
     }
     /*
     //debug用
@@ -370,13 +400,24 @@ void Rendering::DrawTri()
 void Rendering::DrawVoroVer(){
     glColor3f(1, 0.3, 0.0);
     glPointSize(5);
+    
     for (int i = 0; i < triN; i++) {
-        if(tri[i][0] != 0 && tri[i][1] != 0 && tri[i][2] != 0){
-            float *v = voro_ver[i];
-            glBegin(GL_POINTS);
-            glVertex3f(v[0], v[1], v[2]);
-            glEnd();
-         }
+        if(cv.GetDim() == 3){
+            if(tri[i][0] != 0 && tri[i][1] != 0 && tri[i][2] != 0 && tri[i][3] != 0){
+                float *v = voro_ver[i];
+                glBegin(GL_POINTS);
+                glVertex3f(v[0], v[1], v[2]);
+                glEnd();
+            }
+        }
+        if(cv.GetDim() == 2){
+            if(tri[i][0] != 0 && tri[i][1] != 0 && tri[i][2] != 0 ){
+                float *v = voro_ver[i];
+                glBegin(GL_POINTS);
+                glVertex3f(v[0], v[1], v[2]);
+                glEnd();
+            }
+        }
     }
 }
 
@@ -386,16 +427,35 @@ void Rendering::DrawVoroSeg()
     glLineWidth(3);
     glColor3f(1, 0.3, 0.0);
     for (int i = 0; i < triN; i++) {
-        if(tri[i][0] != 0 && tri[i][1] != 0 && tri[i][2] != 0){
-            for (int j = 0; j < 3; j++) {
-                if(tri[tri_neighbor[i][j]][0] != 0 && tri[tri_neighbor[i][j]][1] != 0 && tri[tri_neighbor[i][j]][2] != 0){//infinite vertexを含む三角形は使わない
-                    glBegin(GL_LINES);
-                    glVertex3f(voro_ver[i][0], voro_ver[i][1], voro_ver[i][2]);
-                    glVertex3f(voro_ver[tri_neighbor[i][j]][0], voro_ver[tri_neighbor[i][j]][1], voro_ver[tri_neighbor[i][j]][2]);
-                    glEnd();
+        
+            if(cv.GetDim() == 2)
+            {
+                if(tri[i][0] != 0 && tri[i][1] != 0 && tri[i][2] != 0){
+                    for (int j = 0; j < 3; j++) {
+                        if(tri[tri_neighbor[i][j]][0] != 0 && tri[tri_neighbor[i][j]][1] != 0 && tri[tri_neighbor[i][j]][2] != 0){//infinite vertexを含む三角形は使わない
+                            glBegin(GL_LINES);
+                            glVertex3f(voro_ver[i][0], voro_ver[i][1], voro_ver[i][2]);
+                            glVertex3f(voro_ver[tri_neighbor[i][j]][0], voro_ver[tri_neighbor[i][j]][1], voro_ver[tri_neighbor[i][j]][2]);
+                            glEnd();
+                        }
+                    }
                 }
             }
-        }
+            
+            if(cv.GetDim() == 3)
+            {
+                if(tri[i][0] != 0 && tri[i][1] != 0 && tri[i][2] != 0 && tri[i][3] != 0){
+                    for (int j = 0; j < 4; j++) {
+                        if(tri[tri_neighbor[i][j]][0] != 0 && tri[tri_neighbor[i][j]][1] != 0 && tri[tri_neighbor[i][j]][2] != 0 && tri[tri_neighbor[i][j]][3] != 0){//infinite vertexを含む三角形は使わない
+                            glBegin(GL_LINES);
+                            glVertex3f(voro_ver[i][0], voro_ver[i][1], voro_ver[i][2]);
+                            glVertex3f(voro_ver[tri_neighbor[i][j]][0], voro_ver[tri_neighbor[i][j]][1], voro_ver[tri_neighbor[i][j]][2]);
+                            glEnd();
+                        }
+                    }
+                }
+            }
+            
     }
 }
 

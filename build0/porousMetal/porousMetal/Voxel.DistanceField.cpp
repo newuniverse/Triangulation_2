@@ -8,11 +8,10 @@ void Voxel::ComputeDistanceField()
     start = clock();
     ConstValue cv;
     int x(0), y(0), z(0);
-    
     x = cv.GetX();
     y = cv.GetY();
     z = cv.GetZ();
-    
+    int convergenceRad = cv.GetRad();
     cout << "begin propagation" << endl;
     //##########ここからループに
     
@@ -73,7 +72,7 @@ void Voxel::ComputeDistanceField()
                         
                         end = clock();
                         //cout << "Remove計算時間=" << (end - tempstart)/CLOCKS_PER_SEC<<"sec"<<endl;
-                        if( radius[ labelLayer[xx][yy][zz] ] == 0 && r >= 5 && labelLayer[ xx ][ yy ][ zz ] > 2){
+                        if( radius[ labelLayer[xx][yy][zz] ] == 0 && r >= convergenceRad && labelLayer[ xx ][ yy ][ zz ] > 2){
                             RemoveFromSearchTarget( xx, yy, zz, r );
                             trueSignEvenOnce = true;
                             x_center.push_back(xx);

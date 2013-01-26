@@ -67,6 +67,8 @@ void Voxel::Labeling()
     x = cv.GetX();
     y = cv.GetY();
     z = cv.GetZ();
+    float SD = cv.GetSD();
+    
     cout << x << "" << y<< " " << z;
     int ***visitTable;
     
@@ -194,7 +196,7 @@ void Voxel::Labeling()
                     if(cv.GetDim() == 3)  r = pow( 3.0 * (float)numSum / (4.0*M_PI) , 1.0/3.0);
                     
                     if(labelIndex > 2){
-                        if( sphericityDeviation >= 0.7 )
+                        if( sphericityDeviation >= SD )
                         {
                             x_center.push_back( xx ); //重心
                             y_center.push_back( yy );

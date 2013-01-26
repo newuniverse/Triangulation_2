@@ -9,9 +9,6 @@ std::vector<int> Rendering::ver_oppsite_overlapSph;
 bool** Rendering::tri_attribute;
 int* Rendering::angle_attribute;
 
-void Rendering::Generate_Mesh_Separate(){}
-
-void Rendering::Generate_Mesh_Overlap(){}
 
 //メッシュ生成
 void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro_ver, int tri_index, int pattern, bool isObtuse)
@@ -32,7 +29,7 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
 #pragma region voro and edge intersections
     
     //0番目の頂点に対するvoronoi点と三角形のエッジの交点 [ tri index ][ vertex index ][ 0 ]は
-    if( cross4Points_index[ tri_index ][ 0 ][ 0 ] == -1 )   //まだ登録未完ならのチェック
+    if( cross4Points_index[ tri_index ][ 0 ][ 0 ] == -1 )   //まだ登録未完かのチェック
     { //                 [三角形の番号][頂点番号][voro verとedgeの交点の格納場所]
         std::vector<float> vec(3);
         vec = CalcuCrossPointVoroWithEdge( ver[ 2 ], ver[ 1 ], voro );
@@ -55,8 +52,11 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
         //鈍角三角形であれば,edgeとの交点を新しいvoronoi vertex の位置とする
         if( isObtuse == true && angle_attribute[ tri_index ] == 0 )  
         {
-            for (int i = 0 ; i < 3; i++) {
+            cout << "push in process"<< endl;
+            for (int i = 0 ; i < 3; i++)
+            {
                 replaced_voro[ i ] = vec[ i ];
+                //voro_ver[ i ] = vec[ i ];               /////#################################
             }
         }
         
@@ -92,6 +92,7 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
         {
             for (int i = 0 ; i < 3; i++) {
                 replaced_voro[ i ] = vec[ i ];
+                //voro_ver[ i ] = vec[ i ];               /////#################################
             }
         }
         
@@ -125,6 +126,7 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
         {
             for (int i = 0 ; i < 3; i++) {
                 replaced_voro[ i ] = vec[ i ];
+                //voro_ver[ i ] = vec[ i ];               /////#################################
             }
         }
         //cout << "cross point = "<< vec[0] << ", " << vec[1]<<", "<< vec[2]<< endl;
@@ -142,12 +144,20 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
     for (int i = 0; i < 3; i++) //頂点のインデックス
     {
         dvector* v_to = new dvector[3];
+        dvector zeroVec(3);
+        for (int i = 0; i < 3; i++)  zeroVec[ i ] = 0;
+        cout << "voro ver coordinate before= "<<voro_ver[ 0 ]<< " " <<voro_ver[ 1 ] << " "<< voro_ver[ 2 ] << endl;
+        
+        
         for (int j = 0; j < 3; j++)
         {
             if ( j == i ) {
-               if( angle_attribute[ tri_index ] != i ) v_to[ j ] = voro; //同じインデックスのを voroと頂点でできた線分と球の頂点とする, 鋭角三角形ならば
-               else {
-                   v_to[ j ] = replaced_voro; 
+                if( angle_attribute[ tri_index ] != i ){
+                    v_to[ j ] = voro; //同じインデックスのを voroと頂点でできた線分と球の頂点とする, 鋭角三角形ならば
+                }else
+                    if( isObtuse == true /*&& angle_attribute[ tri_index ] == i */){
+                   cout << "replace voro ver" << endl;
+                   v_to[ j ] = replaced_voro;
                    for(int l = 0; l < 3; l++) voro_ver[l] = replaced_voro[l];     //鈍角三角形ならばvoronoi vertexを移動
                }
             }
@@ -158,6 +168,17 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
                 }
             }
         }
+        if(isObtuse == true){
+            if(i == 0) v_to[ 0 ] = replaced_voro;
+            if(i == 1) v_to[ 1 ] = replaced_voro;
+            if(i == 2) v_to[ 2 ] = replaced_voro;
+        }
+        cout << "voro ver coordinate after= "<<voro_ver[ 0 ]<< " " <<voro_ver[ 1 ] << " "<< voro_ver[ 2 ] << endl;
+        for (int j = 0; j < 3; j++)
+        {
+            cout << " v_to coordinate = "<<v_to[ j ][ 0 ]<< " " << v_to[ j ][ 1 ] << " "<< v_to[ j ][ 2 ] << endl;
+        }
+
         
         for (int l = 0; l < 3; l++)
         {   
@@ -167,19 +188,22 @@ void Rendering::Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro
                 vec =  CalcuCrossIntersectionWithSphere( ver[ i ], v_to[ l ], radius[ tri[ tri_index ][ i ] ] );
                 
                 for (int i = 0; i < 3; i++){
-                    cross4Points_coor[crossPointIndex][i] = vec[i];
+                    cross4Points_coor[crossPointIndex][ i ] = vec[ i ];
                 }
                 cross4Points_index[ tri_index ][ i ][ l + 1 ] = crossPointIndex;  //triに計算した交点のインデックスを登録
                 //cross4Points_coord.push_back( vec );    //計算した交点を入れる              //##*************ここに問題アリ、正しくpush_backされていない*********##//
                 //neiに登録は今のところしない
-                //cout << "cross 3point = "<< vec[ 0 ] << ", " << vec[ 1 ]<<", "<< vec[ 2 ]<< endl;
+                cout << "cross 3point = "<< vec[ 0 ] << ", " << vec[ 1 ]<<", "<< vec[ 2 ]<< endl;
                 
                 crossPointIndex++;
             }
         }
+        
     }
-    //cout << "crossPointIndex = "<< crossPointIndex << endl; //debug用これが12の倍数ならOK!
-    ver_oppsite_overlapSph.clear();
+    cout<<endl;
+    //if(isObtuse == true) getchar();
+ //cout << "crossPointIndex = "<< crossPointIndex << endl; //debug用これが12の倍数ならOK!
+    //ver_oppsite_overlapSph.clear();
 }
 #pragma end rigion intersection with spheres
 
@@ -299,11 +323,11 @@ int Rendering::CheckPattern(float *ver1, float *ver2, float *ver3, float r1, flo
     
     switch (_return_value) {
         case NORMAL:
-            cout << "NORMAL Tri!" << endl; break;
+            //cout << "NORMAL Tri!" << endl; break;
         case OVERLAP:
-            cout << "OVERLAP Tri!" << endl; break;
+            //cout << "OVERLAP Tri!" << endl; break;
         case IRREGULAR:
-            cout << "3OVERLAPS Tri!" << endl; break;
+            //cout << "3OVERLAPS Tri!" << endl; break;
         default:
             break;
     }
@@ -316,32 +340,54 @@ bool Rendering::CheckObtuseTri(float* ver1, float *ver2, float* ver3, float* vor
 {
     
     //c2 > a2 + b2;
-    float length_1_2(0);
-    float length_2_3(0);
-    float length_3_1(0);
     bool _returnValue(false);
     
     dvector voro_to_v1( 2 );
     dvector voro_to_v2( 2 );
     dvector voro_to_v3( 2 );
     
-    dvector sgnPattern( 3 );
+    dvector v3_to_v1( 2 );
+    dvector v3_to_v2( 2 );
+    dvector v1_to_v2( 2 );
+    dvector v1_to_v3( 2 );
+    dvector v2_to_v3( 2 );
+    dvector v2_to_v1( 2 );
+    
+    dvector innerVecSgnPattern( 3 );
+    dvector triVecSgnPattern( 3 );
     for (int i = 0; i < 2; i++) {
         voro_to_v1[ i ] = ver1[ i ] - voro[ i ];
         voro_to_v2[ i ] = ver2[ i ] - voro[ i ];
         voro_to_v3[ i ] = ver3[ i ] - voro[ i ];
+        
+        v3_to_v1[ i ] = ver1[ i ] - ver3[ i ];
+        v3_to_v2[ i ] = ver2[ i ] - ver3[ i ];
+        v1_to_v2[ i ] = ver2[ i ] - ver1[ i ];
+        v1_to_v3[ i ] = ver3[ i ] - ver1[ i ];
+        v2_to_v3[ i ] = ver3[ i ] - ver2[ i ];
+        v2_to_v1[ i ] = ver1[ i ] - ver2[ i ];
     }
     
-    sgnPattern[ 0 ] = calculateVectorProductSgn(voro_to_v2, voro_to_v3 );
-    sgnPattern[ 1 ] = calculateVectorProductSgn(voro_to_v3, voro_to_v1 );
-    sgnPattern[ 2 ] = calculateVectorProductSgn(voro_to_v1, voro_to_v2 );
+    //外積の符号計算
+    innerVecSgnPattern[ 0 ] = calculateVectorProductSgn(voro_to_v2, voro_to_v3 );
+    triVecSgnPattern[ 0 ] = calculateVectorProductSgn(v1_to_v2, v1_to_v3);
+    innerVecSgnPattern[ 1 ] = calculateVectorProductSgn(voro_to_v3, voro_to_v1 );
+    triVecSgnPattern[ 1 ] = calculateVectorProductSgn(v2_to_v3, v2_to_v1);
+    innerVecSgnPattern[ 2 ] = calculateVectorProductSgn(voro_to_v1, voro_to_v2 );
+    triVecSgnPattern[ 2 ] = calculateVectorProductSgn(v3_to_v1, v3_to_v2);
     
     int ver_index;
-    ver_index = checkSgn( sgnPattern );
+    if( innerVecSgnPattern[ 0 ] != triVecSgnPattern[ 0 ] ) ver_index = 0;
+    else if( innerVecSgnPattern[ 1 ] != triVecSgnPattern[ 1 ] ) ver_index = 1;
+    else if (innerVecSgnPattern[ 2 ] != triVecSgnPattern[ 2 ]) ver_index = 2;
+    else ver_index = -1;
+    
+    
+    //ver_index = checkSgn( innerVecSgnPattern );
     if( ver_index >= 0 )
     {
         _returnValue = true;
-        angle_attribute[triIndex] = ver_index;
+        angle_attribute[ triIndex ] = ver_index;
     }
     if( ver_index == -1 ) _returnValue = false;
     if( ver_index == -2 ) cout << "Irregular Triangle index = " << triIndex << endl;

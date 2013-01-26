@@ -20,13 +20,14 @@ public:
     //2D version
     static float **ver; //Delaunay三角形頂点座標　N個頂点×(x,y,z)
     static float *radius;   //球の半径
+    
     static int **tri; //三角形 頂点index 2D用(3点を格納) N個の三角形×３頂点
     static int **tri_neighbor;  //三角形の隣接三角形 N個の三角形×3近隣
     static float **voro_ver; //Voronoi vertex
    
     //3D version
-    static int (*tetra)[4]; //四面体 3D用(4点を格納)
-    static int (*tetra_neighbor)[4];  //四面体の隣接四面体
+    static int (**tetra); //四面体 3D用(4点を格納)
+    static int (**tetra_neighbor);  //四面体の隣接四面体
     
     //Mesh後に増える頂点
     static std::vector< std::vector<float> > cross4Points_coord;   //交点座標格納
@@ -39,6 +40,7 @@ public:
     
     //メッシュ生成
     static void Meshing();
+    static void Meshing3D();
     
     //OpenGL関連
     static void OpenglRendering(int argc, char** argv); //OpenGLで描画、Main関数内に記述する
@@ -75,20 +77,29 @@ private:
     static int *angle_attribute;//鈍角である頂点のインデックスを三角形ごとに保持
     
     static void InitMeshing();  //メッシング前に交点格納配列のメモリ確保
+    static void Init3DMeshing();
     static bool CheckObtuseTri(float* ver1, float *ver2, float* ver3, float* voro, int triIndex);  //鈍角三角形か
+    static bool CheckVoroVerPosition( float* ver0, float *ver1, float *ver2, float *ver3, float *voro, int tetraIndex );
     
     static int CheckPattern(float* ver1, float *ver2, float* ver3, float r1,  float r2, float r3, int triIndex,int label1, int label2, int label3); //Voronoiのパターンをチェック
+    static int CheckPattern( float * ver0, float *ver1, float* ver2, float* ver3, float r0, float r1,  float r2, float r3, int tetraIndex);
     
     static void PushVoroVerIntoTri(float* ver1, float* ver2, float* ver3, float r1,  float r2, float r3, float* voro_ver); //鈍角三角形だった場合にvoronoi vertexを三角形内へ移動させる関数
    
     static void Generate_Mesh(float* ver1, float* ver2, float* ver3, float* voro_ver, int tri_index, int pattern, bool isObtuse );
-    static void Generate_Mesh_Separate();
-    static void Generate_Mesh_Overlap();
+    
+    static void Generate_3DMesh(float* ver0, float* ver1, float* ver2,float* ver3,float* voro_ver, int tetra_index, int pattern, bool isVoroVerOutside );
+    
     
     static std::vector <float> CalcuCrossPointVoroWithEdge( dvector s_v, dvector l_s_v, dvector voro ); //voronoi vertexと三角形の辺との交点を求める関数、 頂点をstdのvectorとして返す
     static std::vector <float> CalcuCrossIntersectionWithSphere(dvector v_from, dvector v_to, float rad );
     static std::vector <float> CalcuCrossOverlap( dvector ve, dvector vref, dvector voro, float rad );
     
     static bool calculateVectorProductSgn( dvector v1, dvector v2 ); //外積計算用の関数
+    static bool calculateScalar3product( dvector v0, dvector v1, dvector v2 );//スカラ三重積計算
+    
     static int checkSgn( dvector vec ); //３つの外積の符号の場合わけをチェックし、"鈍角"となっている頂点のインデックスを返す
+    
+    static bool CheckNoInfiniteVertex( int tri0, int tri1, int tri2, int tri3 );
+ 
 };
