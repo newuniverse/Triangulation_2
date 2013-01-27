@@ -46,11 +46,14 @@ int main (int argc, char ** argv)
         case cv.RENDERING:
         {
             Rendering::InitValues();
-            if(cv.GetDim() == 2) Rendering::ReadCoordinate("triangulation.txt");//球、Delaunay、Voronoiの読み込み
-            if(cv.GetDim() == 3) Rendering::ReadCoordinate3D("triangulation3D.txt");
-            
-            Rendering::Meshing();
-            
+            if(cv.GetDim() == 2){
+                Rendering::ReadCoordinate("triangulation.txt");//球、Delaunay、Voronoiの読み込み
+                Rendering::Meshing();
+            }
+            if(cv.GetDim() == 3) {
+                Rendering::ReadCoordinate3D("triangulation3D.txt");
+                //Rendering::Meshing3D();
+            }
             //cv.MovePhase();
             Rendering::OpenglRendering(argc, argv);
             break;

@@ -3,6 +3,7 @@ float ** Rendering::newVerCoord;
 int *** Rendering::verOnSphereIndex;
 int ** Rendering::verOnTetraSurfaceIndex;
 int *** Rendering::verOnTetraEdgeIndex;
+int *** Rendering::hexaCoord;
 
 void Rendering::Meshing3D(){
     
@@ -31,9 +32,15 @@ void Rendering::Meshing3D(){
 void Rendering::Generate_3DMesh(float *ver0, float *ver1, float *ver2, float *ver3, float *voro_ver, int tetra_index, int pattern, bool isVoroVerOutside){
     
     dvector voro( 3 );   //引数のvoronoi点を複製
+    dvector* voro_edge = new dvector[ 6 ];//辺上にある，Voronoiとの交点
     dvector* ver = new dvector[ 4 ]; //引数の四面体頂点を複製
     dvector replaced_voro( 3 );   //鈍角三角形の時、球との交点を求める際に三角形外にあるvoronoi vertexを変位させて、ここに格納
-    for( int i = 0 ; i < 4; i++ ) ver[i].resize( 3 );
+    for( int i = 0 ; i < 6; i++ )
+    {
+        if( i < 4 ) ver[i].resize( 3 );
+        voro_edge[ i ].resize( 3 );
+    }
+        
     
     for ( int i = 0 ; i < 3; i++ )
     {
@@ -44,14 +51,85 @@ void Rendering::Generate_3DMesh(float *ver0, float *ver1, float *ver2, float *ve
         voro[ i ] = voro_ver[ i ];
     }
     
-    //一番目の頂点に対して
-    if( verOnTetraSurfaceIndex[ tetra_index ][ 0 ] == -1 )
+    
+    
+   //四面体の4面上にあるVoronoi点からの垂足
+    for( int current = 0; current < 4 ; current++)
     {
-        dvector temp(3);
-        temp = CalcVoroWithSurface( voro, ver[ 1 ], ver[ 2 ], ver[ 3 ]);
-    }
+       
+        //if( verOnTetraSurfaceIndex[ tetra_index ][ current ] == -1 ){
+            dvector temp(3);
+            dvector* v = new dvector[ 3 ];
+            for( int i = 0 ; i < 3; i++ ) ver[i].resize( 3 );
         
+            int counter(0);
+            for ( int j = 0; j < 4; j++) {
+                if( j != current ){
+                    v[ counter ] = ver[ j ];
+                    counter++;
+                }
+            }
+            
+            temp = CalcVoroWithSurface( voro, v[ 1 ], v[ 2 ], v[ 3 ]);
+        
+            if( pattern == OVERLAP ){}                                                  //####
+        
+            for (int j = 0; j < 3; j++) newVerCoord[ crossPointIndex ][ j ] = temp[ j ];
+        
+            if( isVoroVerOutside == true  && angle_attribute[ tetra_index ] == current )
+            {
+                replaced_voro= temp;
+            }
+            verOnTetraSurfaceIndex[ tetra_index ][ current ] = crossPointIndex;
+            crossPointIndex++;
+        //}
+    }
+    
+    //エッジ上にある点
+    int cnter(0);
+    for( int current = 0; current < 4 ; current++ )
+    {
 
+        dvector* temp = new dvector[ 3 ];
+        dvector* v = new dvector[ 3 ];
+        for( int i = 0 ; i < 3; i++ )
+        {
+            ver[i].resize( 3 );
+            temp[ i ].resize(3);
+        }
+            
+        int counter(0);
+        for ( int j = 0; j < 4; j++) {
+            if( j != current ){
+                v[ counter ] = ver[ j ];
+                counter++;
+            }
+        }
+        
+        for(int i = 0 ; i< 3;i++) {
+            temp[ i ] = CalcVoroWithEdge( voro, ver[ current ], v[ i ] );
+            for (int j = current; j < 3; j++){
+                for( int k = 0; k< 3;k++ )
+                {
+                    newVerCoord[ crossPointIndex ][ k ] = temp[ j ][ k ];
+                    voro_edge[ cnter ] = temp[ j ];
+                    cnter++;
+                }
+                verOnTetraEdgeIndex[ tetra_index ][ current ][ j ] = crossPointIndex;
+                verOnTetraEdgeIndex[ tetra_index ][ j + 1 ][ current ] = crossPointIndex;
+                crossPointIndex++;
+            }
+        }
+        if( pattern == OVERLAP ){}
+    }
+    
+    //Sphere上にある点
+    for( int current = 0; current < 4 ; current++ )
+    {
+    //    dvector
+    }
+    
+    
 
 }
 
@@ -146,6 +224,7 @@ dvector Rendering:: CalcIntersectionWithSphere(dvector v_from, dvector v_to, flo
 
 void Rendering::Init3DMeshing()
 {
+    
     newVerCoord = new float*[ 42*triN ];
     for( int i = 0; i < 42*triN; i++ )  newVerCoord[ i ] = new float[ 3 ];
     
@@ -277,7 +356,7 @@ int Rendering::CheckPattern(float *ver0, float *ver1, float *ver2, float *ver3, 
         //ver_oppsite_overlapSph.push_back()
         overlapCounter++;
     }
-    if( overlapCounter >= 4) _return_value = IRREGULAR;  //############ここは４か6か？
+    if( overlapCounter >= 6) _return_value = IRREGULAR;  //############ここは４か6か？
     
     switch (_return_value) {
         case NORMAL:

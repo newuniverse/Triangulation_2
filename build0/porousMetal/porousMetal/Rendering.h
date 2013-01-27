@@ -49,6 +49,8 @@ public:
     static int ***verOnSphereIndex;
     static int **verOnTetraSurfaceIndex;
     static int ***verOnTetraEdgeIndex;
+    static int ***hexaCoord;
+    
     
     //球の座標及び半径の読み込み
     static void ReadCoordinate(string filename);

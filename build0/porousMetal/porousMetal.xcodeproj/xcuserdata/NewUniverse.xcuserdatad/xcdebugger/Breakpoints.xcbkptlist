@@ -149,7 +149,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "201"
          endingLineNumber = "201"
-         landmarkName = "Voxel::FindLocalMaximum(float ***table, int &amp;x, int &amp;y, int &amp;z, float &amp;dis)"
+         landmarkName = "Voxel::ComputeDistanceField()"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -188,7 +188,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "199"
          endingLineNumber = "199"
-         landmarkName = "Voxel::FindLocalMaximum(float ***table, int &amp;x, int &amp;y, int &amp;z, float &amp;dis)"
+         landmarkName = "Voxel::ComputeDistanceField()"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -226,7 +226,9 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "176"
-         endingLineNumber = "176">
+         endingLineNumber = "176"
+         landmarkName = "Voxel::ComputeDistanceField()"
+         landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
