@@ -3,7 +3,7 @@ float ** Rendering::newVerCoord;
 int *** Rendering::verOnSphereIndex;
 int ** Rendering::verOnTetraSurfaceIndex;
 int *** Rendering::verOnTetraEdgeIndex;
-int *** Rendering::hexaCoord;
+float **** Rendering::hexaCoord;
 
 void Rendering::Meshing3D(){
     
@@ -51,8 +51,30 @@ void Rendering::Generate_3DMesh(float *ver0, float *ver1, float *ver2, float *ve
         voro[ i ] = voro_ver[ i ];
     }
     
+    dvector temp(3);
     
-    
+    if( isVoroVerOutside == true  )
+    {
+        int obtuseIndex = angle_attribute[ tetra_index ];
+        dvector* v = new dvector[ 3 ];
+        for( int i = 0 ; i < 3; i++ ) ver[i].resize( 3 );
+        int counter(0);
+        for ( int j = 0; j < 4; j++) {
+            if( j != obtuseIndex ){
+                v[ counter ] = ver[ j ];
+                counter++;
+            }
+        }
+        temp = CalcVoroWithSurface( voro, v[ 1 ], v[ 2 ], v[ 3 ]);
+        replaced_voro = temp;
+    }
+    temp.clear();
+    temp.resize(3);
+    if(isVoroVerOutside == false){
+        hexaCoord[ tetra_index ][ 0 ][ 0 ] = voro_ver;
+        //hexaCoord[ tetra_index ][ 0 ][ 1 ] =
+    }
+    /*
    //四面体の4面上にあるVoronoi点からの垂足
     for( int current = 0; current < 4 ; current++)
     {
@@ -126,9 +148,12 @@ void Rendering::Generate_3DMesh(float *ver0, float *ver1, float *ver2, float *ve
     //Sphere上にある点
     for( int current = 0; current < 4 ; current++ )
     {
-    //    dvector
+        dvector* temp = new dvector[ 7 ];
+        for (int i = 0; i < 7; i++) temp[ i ].resize( 3 );
+        
+        
     }
-    
+    */
     
 
 }
@@ -224,7 +249,22 @@ dvector Rendering:: CalcIntersectionWithSphere(dvector v_from, dvector v_to, flo
 
 void Rendering::Init3DMeshing()
 {
+    //hexaは triN, hexaN, verN, coorの構造，直接レンダリング・吐き出せるように
+    hexaCoord = new float***[ triN ];
     
+    for (int i = 0; i < triN; i++)
+        hexaCoord[ i ] = new float **[ 12 ];
+    
+    for (int i = 0; i < triN; i++) 
+        for( int j = 0; j < 12; j++ )
+        hexaCoord[ i ][ j ] = new float *[ 8 ];
+    
+    for (int i = 0; i < triN; i++)
+        for( int j = 0; j < 12; j++ )
+            for( int k = 0; k < 8; k++ )
+                hexaCoord[ i ][ j ][ k ] = new float[ 3 ];
+    
+    /*
     newVerCoord = new float*[ 42*triN ];
     for( int i = 0; i < 42*triN; i++ )  newVerCoord[ i ] = new float[ 3 ];
     
@@ -264,7 +304,7 @@ void Rendering::Init3DMeshing()
             }
         }
     }
-    
+    */
 }
 
 bool Rendering::CheckNoInfiniteVertex(int tri0, int tri1, int tri2, int tri3)

@@ -49,7 +49,7 @@ public:
     static int ***verOnSphereIndex;
     static int **verOnTetraSurfaceIndex;
     static int ***verOnTetraEdgeIndex;
-    static int ***hexaCoord;
+    static float ****hexaCoord;
     
     
     //球の座標及び半径の読み込み
